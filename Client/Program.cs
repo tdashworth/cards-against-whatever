@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,6 +20,10 @@ namespace CardsAgainstWhatever.Client
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddSingleton(sp => new HubConnectionBuilder()
+                .WithUrl(sp.GetService<NavigationManager>().ToAbsoluteUri("/gamehub"))
+                .WithAutomaticReconnect()
+                .Build());
 
             await builder.Build().RunAsync();
         }

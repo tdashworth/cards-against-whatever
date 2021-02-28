@@ -1,7 +1,69 @@
 ﻿@page "/"
+@using System.IO
+@using System.Globalization
+@using CsvHelper
+@using CsvHelper.Configuration
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+<h3>CsvTest</h3>
 
-<h1>Hello, world!</h1>
+<div>
+    <InputFile OnChange="@OnFileSelection" />
 
-Welcome to your new app.
+    <p>@Questions.Count question card(s) found. @Answers.Count answer card(s) found.</p>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div>
+    <input @bind-value="Username" />
+    <button @onclick="CreateAndJoin" disabled="@(!IsConnected)">Create</button>
+</div>
+
+<h1>@GameCode</h1>
+
+@code {
+    List<QuestionCard> Questions = new();
+    List<AnswerCard> Answers = new();
+    string GameCode;
+    string Username;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HubConnection.StartAsync();
+    }
+
+    async Task OnFileSelection(InputFileChangeEventArgs e)
+    {
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            PrepareHeaderForMatch = args => args.Header.ToLower(),
+        };
+
+        using var csvReader = new CsvReader(
+        new StreamReader(e.File.OpenReadStream()), config);
+
+        await foreach (var card in csvReader.GetRecordsAsync<Card>())
+        {
+            if (card.Type == CardType.Question)
+            {
+                Questions.Add(new QuestionCard(card.Text, card.Pick));
+            }
+            if (card.Type == CardType.Answer)
+            {
+                Answers.Add(new AnswerCard(card.Text));
+            }
+        }
+    }
+
+    public bool IsConnected =>
+        HubConnection.State == HubConnectionState.Connected;
+
+    async Task CreateAndJoin()
+    {
+        GameCode = await HubConnection.InvokeAsync<string>("CreateGame", Questions, Answers);
+        await HubConnection.SendAsync("JoinGame", GameCode, Username);
+    }
+
+    enum CardType { Question, Answer };
+    record Card(string Text, CardType Type, int Pick);
+}
