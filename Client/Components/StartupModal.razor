@@ -1,0 +1,25 @@
+﻿
+<div class="modal d-block" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col p-5 border-right">
+                        <CreateGameForm OnGameJoined="OnGameJoined" />
+                    </div>
+
+                    <div class="col p-5">
+                        <JoinGameForm OnGameJoined="OnGameJoined" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<(string, string)> OnGameJoined { get; set; }
+}

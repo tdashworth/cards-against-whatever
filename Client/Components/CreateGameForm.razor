@@ -1,0 +1,94 @@
+﻿@using System.IO
+@using System.Globalization
+@using CsvHelper
+@using CsvHelper.Configuration
+@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+
+
+<EditForm Model="@CreateModel" OnValidSubmit="@HandleValidSubmit">
+    <h2>Create Game</h2>
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="card-pack-file" class="col-form-label">Card Pack</label>
+        <div class="custom-file">
+            <InputFile OnChange="OnCardsFileSelection" class="custom-file-input" accept=".csv" />
+            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="create-username-text" class="col-form-label">Username</label>
+        <InputText @bind-Value="CreateModel.Username" class="form-control" id="create-username-text" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public EventCallback<(string, string)> OnGameJoined { get; set; }
+
+    private class CreateForm
+    {
+        [Required]
+        [StringLength(10, ErrorMessage = "Name is too long.")]
+        public string Username { get; set; }
+
+        public List<QuestionCard> Questions = new();
+
+        public List<AnswerCard> Answers = new();
+    }
+
+    CreateForm CreateModel = new CreateForm();
+
+    async Task OnCardsFileSelection(InputFileChangeEventArgs e)
+    {
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = true,
+            PrepareHeaderForMatch = args => args.Header.ToLower(),
+        };
+
+        using var csvReader = new CsvReader(
+        new StreamReader(e.File.OpenReadStream()), config);
+
+        await foreach (var card in csvReader.GetRecordsAsync<Card>())
+        {
+            if (card.Type == CardType.Question)
+            {
+                CreateModel.Questions.Add(new QuestionCard(card.Text, card.Pick));
+            }
+            if (card.Type == CardType.Answer)
+            {
+                CreateModel.Answers.Add(new AnswerCard(card.Text));
+            }
+        }
+    }
+
+    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var gameCode = await HubConnection.InvokeAsync<string>("CreateGame", CreateModel.Questions, CreateModel.Answers);
+            await HubConnection.InvokeAsync("JoinGame", gameCode, CreateModel.Username);
+
+            await OnGameJoined.InvokeAsync((gameCode, CreateModel.Username));
+        }
+        catch (Exception ex)
+        {
+            //TODO
+        }
+    }
+
+    enum CardType { Question, Answer };
+    record Card(string Text, CardType Type, int Pick);
+
+}

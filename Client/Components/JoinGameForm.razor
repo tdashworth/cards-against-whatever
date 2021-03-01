@@ -1,0 +1,55 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+
+
+<EditForm Model="@JoinModel" OnValidSubmit="@HandleValidSubmit">
+    <h2>Join Game</h2>
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="game-code-text" class="col-form-label">Game Code</label>
+        <InputText @bind-Value="JoinModel.GameCode" class="form-control" id="game-code-text" />
+    </div>
+    <div class="form-group">
+        <label for="join-username-text" class="col-form-label">Username</label>
+        <InputText @bind-Value="JoinModel.Username" class="form-control" id="join-username-text" />
+    </div>
+    <button type="submit" class="btn btn-primary">Join</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public EventCallback<(string, string)> OnGameJoined { get; set; }
+
+    private class JoinForm
+    {
+        [Required]
+        [StringLength(10, ErrorMessage = "Name is too long.")]
+        public string Username { get; set; }
+
+        [Required]
+        [StringLength(5, ErrorMessage = "Code is too long.")]
+        public string GameCode { get; set; }
+    }
+
+    JoinForm JoinModel = new JoinForm();
+
+    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await HubConnection.InvokeAsync("JoinGame", JoinModel.GameCode, JoinModel.Username);
+            await OnGameJoined.InvokeAsync((JoinModel.GameCode, JoinModel.Username));
+        } 
+        catch (Exception ex) 
+        {
+            //TODO
+        }
+    }
+}

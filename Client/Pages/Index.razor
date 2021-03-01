@@ -1,69 +1,29 @@
 ﻿@page "/"
-@using System.IO
-@using System.Globalization
-@using CsvHelper
-@using CsvHelper.Configuration
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
-<h3>CsvTest</h3>
 
-<div>
-    <InputFile OnChange="@OnFileSelection" />
+@if (GameCode == string.Empty)
+{
+    <StartupModal OnGameJoined="@OnGameJoined" />
+}
+else
+{
+    <h2>Game Joined: @GameCode (@Username)</h2>
+}
 
-    <p>@Questions.Count question card(s) found. @Answers.Count answer card(s) found.</p>
-</div>
-
-<div>
-    <input @bind-value="Username" />
-    <button @onclick="CreateAndJoin" disabled="@(!IsConnected)">Create</button>
-</div>
-
-<h1>@GameCode</h1>
 
 @code {
-    List<QuestionCard> Questions = new();
-    List<AnswerCard> Answers = new();
-    string GameCode;
-    string Username;
+    string GameCode { get; set; } = string.Empty;
+    string Username { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         await HubConnection.StartAsync();
     }
 
-    async Task OnFileSelection(InputFileChangeEventArgs e)
+    void OnGameJoined((string GameCode, string UserName) param)
     {
-        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            HasHeaderRecord = true,
-            PrepareHeaderForMatch = args => args.Header.ToLower(),
-        };
-
-        using var csvReader = new CsvReader(
-        new StreamReader(e.File.OpenReadStream()), config);
-
-        await foreach (var card in csvReader.GetRecordsAsync<Card>())
-        {
-            if (card.Type == CardType.Question)
-            {
-                Questions.Add(new QuestionCard(card.Text, card.Pick));
-            }
-            if (card.Type == CardType.Answer)
-            {
-                Answers.Add(new AnswerCard(card.Text));
-            }
-        }
+        GameCode = param.GameCode;
+        Username = param.UserName;
     }
-
-    public bool IsConnected =>
-        HubConnection.State == HubConnectionState.Connected;
-
-    async Task CreateAndJoin()
-    {
-        GameCode = await HubConnection.InvokeAsync<string>("CreateGame", Questions, Answers);
-        await HubConnection.SendAsync("JoinGame", GameCode, Username);
-    }
-
-    enum CardType { Question, Answer };
-    record Card(string Text, CardType Type, int Pick);
 }
