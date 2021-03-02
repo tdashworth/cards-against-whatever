@@ -10,8 +10,10 @@ namespace CardsAgainstWhatever.Server.Services.Interfaces
     {
         Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards);
 
-        Task Join(string gameCode, string username);
+        Task<Player> Join(string gameCode, string username, string connectionId);
 
         Task Leave(string gameCode, string username);
+        Task<List<Player>> GetPlayers(string gameCode);
+        Task<Dictionary<ServerPlayer, List<AnswerCard>>> StartRound(string gameCode);
     }
 }

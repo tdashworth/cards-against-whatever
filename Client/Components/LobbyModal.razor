@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+@inject GameStateContainer GameState
+
+<div class="modal d-block" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col px-5 py-3">
+                        <h2>Welcome to Card Against Whatever!</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col px-5 py-3">
+                        <h4>Game Code: @GameState.Code</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col px-5">
+                        <ul class="list-group list-group-horizontal">
+                            @foreach (var player in GameState.Players)
+                            {
+                                <li class="list-group-item">@player.Username</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col px-5">
+                        <button class="btn btn-primary" @onclick="StartRound">Start</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        GameState.OnChange += StateHasChanged;
+    }
+
+    async Task StartRound()
+    {
+        await HubConnection.SendAsync(nameof(IGameServer.StartRound), GameState.Code);
+    }
+}

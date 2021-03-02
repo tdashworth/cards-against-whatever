@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Shared
 {
-    public class Player
+    public interface IGameClient
     {
-        public string Username { get; set; }
-        public int Score { get; set; }
+        Task NewPlayer(Player player);
+
+        Task NewRound(List<AnswerCard> answerCards);
     }
 }

@@ -1,0 +1,25 @@
+﻿@inject GameStateContainer GameState
+
+
+<div class="card-deck">
+    @foreach (var card in GameState.CardsInHand)
+    {
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">@card.Text</h5>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameState.OnChange += StateHasChanged;
+    }
+
+}

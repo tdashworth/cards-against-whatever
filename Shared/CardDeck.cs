@@ -39,7 +39,7 @@ namespace CardsAgainstWhatever.Shared
             return answer;
         }
 
-        public IEnumerable<AnswerCard> PickUpAnswers(int count)
+        public List<AnswerCard> PickUpAnswers(int count)
         {
             var answers = new List<AnswerCard>();
             for (int i = 0; i < count; i++)

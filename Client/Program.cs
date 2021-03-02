@@ -1,3 +1,4 @@
+using CardsAgainstWhatever.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -24,6 +25,7 @@ namespace CardsAgainstWhatever.Client
                 .WithUrl(sp.GetService<NavigationManager>().ToAbsoluteUri("/gamehub"))
                 .WithAutomaticReconnect()
                 .Build());
+            builder.Services.AddSingleton(sp => new GameStateContainer());
 
             await builder.Build().RunAsync();
         }

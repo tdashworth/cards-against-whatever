@@ -5,10 +5,11 @@
 @using System.ComponentModel.DataAnnotations;
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
+@inject GameStateContainer GameState
 
 
 <EditForm Model="@CreateModel" OnValidSubmit="@HandleValidSubmit">
-    <h2>Create Game</h2>
+    <h3>Create Game</h3>
 
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -31,8 +32,6 @@
 
 
 @code {
-    [Parameter]
-    public EventCallback<(string, string)> OnGameJoined { get; set; }
 
     private class CreateForm
     {
@@ -77,10 +76,10 @@
     {
         try
         {
-            var gameCode = await HubConnection.InvokeAsync<string>("CreateGame", CreateModel.Questions, CreateModel.Answers);
-            await HubConnection.InvokeAsync("JoinGame", gameCode, CreateModel.Username);
+            var gameCode = await HubConnection.InvokeAsync<string>(nameof(IGameServer.CreateGame), CreateModel.Questions, CreateModel.Answers);
+            var players = await HubConnection.InvokeAsync<List<Player>>(nameof(IGameServer.JoinGame), gameCode, CreateModel.Username);
 
-            await OnGameJoined.InvokeAsync((gameCode, CreateModel.Username));
+            GameState.JoinGame(gameCode, CreateModel.Username, players);
         }
         catch (Exception ex)
         {

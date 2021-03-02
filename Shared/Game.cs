@@ -10,7 +10,7 @@ namespace CardsAgainstWhatever.Shared
     {
         public readonly string Code;
         public readonly CardDeck CardDeck;
-        public readonly List<Player> Players;
+        public readonly List<ServerPlayer> Players;
 
         public Game(string code, CardDeck cardDeck)
         {

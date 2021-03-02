@@ -4,15 +4,17 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="row">
-
+                    <div class="col px-5 py-3">
+                        <h2>Welcome to Card Against Whatever!</h2>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col p-5 border-right">
-                        <CreateGameForm OnGameJoined="OnGameJoined" />
+                        <CreateGameForm />
                     </div>
-
                     <div class="col p-5">
-                        <JoinGameForm OnGameJoined="OnGameJoined" />
+                        <JoinGameForm />
                     </div>
-
                 </div>
             </div>
         </div>
@@ -20,6 +22,5 @@
 </div>
 
 @code {
-    [Parameter]
-    public EventCallback<(string, string)> OnGameJoined { get; set; }
+
 }

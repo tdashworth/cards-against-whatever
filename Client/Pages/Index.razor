@@ -1,29 +1,28 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
+@inject GameStateContainer GameState
 
-@if (GameCode == string.Empty)
+<SignalRListeners />
+
+@if (GameState.State == Client.GameState.New)
 {
-    <StartupModal OnGameJoined="@OnGameJoined" />
+    <StartupModal />
 }
-else
+else if (GameState.State == Client.GameState.Joined)
 {
-    <h2>Game Joined: @GameCode (@Username)</h2>
+    <LobbyModal />
+}
+else if (GameState.State == Client.GameState.PickAnswerCards)
+{
+    <GameBoard />
 }
 
 
 @code {
-    string GameCode { get; set; } = string.Empty;
-    string Username { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        await HubConnection.StartAsync();
-    }
-
-    void OnGameJoined((string GameCode, string UserName) param)
-    {
-        GameCode = param.GameCode;
-        Username = param.UserName;
+        GameState.OnChange += StateHasChanged;
     }
 }
