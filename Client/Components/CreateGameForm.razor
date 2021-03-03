@@ -76,14 +76,18 @@
     {
         try
         {
-            var response = await HubConnection.InvokeAsync<CreateGameResponse>(nameof(IGameServer.CreateGame), new CreateGameRequest { 
-                QuestionCards = CreateModel.Questions, 
+            var createResponse = await HubConnection.InvokeAsync<CreateGameResponse>(nameof(IGameServer.CreateGame), new CreateGameRequest {
+                QuestionCards = CreateModel.Questions,
                 AnswerCards = CreateModel.Answers
             });
 
-            var players = await HubConnection.InvokeAsync<List<Player>>(nameof(IGameServer.JoinGame), response.GameCode, CreateModel.Username);
+            var joinResponse = await HubConnection.InvokeAsync<JoinGameResponse>(nameof(IGameServer.JoinGame), new JoinGameRequest
+            {
+                GameCode = createResponse.GameCode,
+                Username = CreateModel.Username
+            });
 
-            GameState.JoinGame(response.GameCode, CreateModel.Username, players);
+            GameState.JoinGame(createResponse.GameCode, CreateModel.Username, joinResponse.ExistingPlayersInGame);
         }
         catch (Exception ex)
         {

@@ -11,9 +11,7 @@ namespace CardsAgainstWhatever.Shared.Interfaces
     public interface IGameServer
     {
         Task<CreateGameResponse> CreateGame(CreateGameRequest request);
-
-        Task<List<Player>> JoinGame(string code, string username);
-
+        Task<JoinGameResponse> JoinGame(JoinGameRequest request);
         Task StartRound(string code);
     }
 }

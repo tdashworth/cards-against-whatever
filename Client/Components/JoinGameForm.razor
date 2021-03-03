@@ -42,8 +42,13 @@
     {
         try
         {
-            var players = await HubConnection.InvokeAsync<List<Player>>(nameof(IGameServer.JoinGame), JoinModel.GameCode, JoinModel.Username);
-            GameState.JoinGame(JoinModel.GameCode, JoinModel.Username, players);
+            var joinResponse = await HubConnection.InvokeAsync<JoinGameResponse>(nameof(IGameServer.JoinGame), new JoinGameRequest
+            {
+                GameCode = JoinModel.GameCode,
+                Username = JoinModel.Username
+            });
+
+            GameState.JoinGame(JoinModel.GameCode, JoinModel.Username, joinResponse.ExistingPlayersInGame);
         }
         catch (Exception ex)
         {

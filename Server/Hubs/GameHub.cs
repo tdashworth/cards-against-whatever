@@ -22,16 +22,20 @@ namespace CardsAgainstWhatever.Server.Hubs
         }
 
         public async Task<CreateGameResponse> CreateGame(CreateGameRequest request)
-            => new CreateGameResponse { GameCode = await GameService.Create(request.QuestionCards, request.AnswerCards) };
+            => new CreateGameResponse { 
+                GameCode = await GameService.Create(request.QuestionCards, request.AnswerCards) 
+            };
 
-        public async Task<List<Player>> JoinGame(string gameCode, string username)
+        public async Task<JoinGameResponse> JoinGame(JoinGameRequest request)
         {
-            var player = await GameService.Join(gameCode, username, Context.ConnectionId);
+            var player = await GameService.Join(request.GameCode, request.Username, Context.ConnectionId);
 
-            await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
-            await Clients.OthersInGroup(gameCode).NewPlayer(player);
+            await Groups.AddToGroupAsync(Context.ConnectionId, request.GameCode);
+            await Clients.OthersInGroup(request.GameCode).NewPlayer(player);
 
-            return await GameService.GetPlayers(gameCode);
+            return new JoinGameResponse { 
+                ExistingPlayersInGame = await GameService.GetPlayers(request.GameCode) 
+            };
         }
 
         public async Task StartRound(string gameCode)
