@@ -5,7 +5,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<Player>(nameof(IGameClient.NewPlayer), (Player player) => GameState.AddPlayer(player));
+        HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), (NewPlayerEvent newPlayerEvent) => GameState.AddPlayer(newPlayerEvent.NewPlayer));
 
         HubConnection.On<List<AnswerCard>>(nameof(IGameClient.NewRound), (List<AnswerCard> cards) => GameState.AddCards(cards));
 

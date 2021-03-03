@@ -31,7 +31,7 @@ namespace CardsAgainstWhatever.Server.Hubs
             var player = await GameService.Join(request.GameCode, request.Username, Context.ConnectionId);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, request.GameCode);
-            await Clients.OthersInGroup(request.GameCode).NewPlayer(player);
+            await Clients.OthersInGroup(request.GameCode).NewPlayer(new NewPlayerEvent { NewPlayer = player });
 
             return new JoinGameResponse { 
                 ExistingPlayersInGame = await GameService.GetPlayers(request.GameCode) 

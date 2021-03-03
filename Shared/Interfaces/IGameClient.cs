@@ -1,4 +1,5 @@
-﻿using CardsAgainstWhatever.Shared.Models;
+﻿using CardsAgainstWhatever.Shared.Dtos;
+using CardsAgainstWhatever.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace CardsAgainstWhatever.Shared.Interfaces
 {
     public interface IGameClient
     {
-        Task NewPlayer(Player player);
+        Task NewPlayer(NewPlayerEvent newPlayer);
 
         Task NewRound(List<AnswerCard> answerCards);
     }
