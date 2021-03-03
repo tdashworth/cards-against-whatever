@@ -1,5 +1,6 @@
 ﻿using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
+using CardsAgainstWhatever.Shared.Dtos;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -20,15 +21,13 @@ namespace CardsAgainstWhatever.Server.Hubs
             GameService = gameService;
         }
 
-        public Task<string> CreateGame(List<QuestionCard> questions, List<AnswerCard> answers)
-        {
-            return GameService.Create(questions, answers);
-        }
+        public async Task<CreateGameResponse> CreateGame(CreateGameRequest request)
+            => new CreateGameResponse { GameCode = await GameService.Create(request.QuestionCards, request.AnswerCards) };
 
         public async Task<List<Player>> JoinGame(string gameCode, string username)
         {
             var player = await GameService.Join(gameCode, username, Context.ConnectionId);
-            
+
             await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
             await Clients.OthersInGroup(gameCode).NewPlayer(player);
 
@@ -41,7 +40,7 @@ namespace CardsAgainstWhatever.Server.Hubs
             await Task.WhenAll(cardsToDeal.Select(kvp => Clients.Client(kvp.Key.ConnectionId).NewRound(kvp.Value)));
         }
 
-        
+
 
     }
 }
