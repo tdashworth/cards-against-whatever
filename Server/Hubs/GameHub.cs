@@ -1,5 +1,7 @@
 ﻿using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
+using CardsAgainstWhatever.Shared.Interfaces;
+using CardsAgainstWhatever.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;

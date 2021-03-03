@@ -1,5 +1,7 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Models;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
+using CardsAgainstWhatever.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,11 @@ namespace CardsAgainstWhatever.Server.Services
 {
     public class GameRepository : IGameRepositoy
     {
-        private static IDictionary<string, Game> GameStore = new Dictionary<string, Game>();
+        private static IDictionary<string, ServerGame> GameStore = new Dictionary<string, ServerGame>();
 
         public Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards)
         {
-            var game = new Game(
+            var game = new ServerGame(
                 GeneratorUniqueCode(new Random(), GameStore.Keys), 
                 new CardDeck(questionCards, answerCards));
 
@@ -23,7 +25,7 @@ namespace CardsAgainstWhatever.Server.Services
             return Task.FromResult(game.Code);
         }
 
-        public Task<Game> GetByCode(string code)
+        public Task<ServerGame> GetByCode(string code)
         {
             if (!GameStore.ContainsKey(code))
             {
