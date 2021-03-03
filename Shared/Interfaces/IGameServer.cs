@@ -12,6 +12,6 @@ namespace CardsAgainstWhatever.Shared.Interfaces
     {
         Task<CreateGameResponse> CreateGame(CreateGameRequest request);
         Task<JoinGameResponse> JoinGame(JoinGameRequest request);
-        Task StartRound(string code);
+        Task StartRound(StartRoundRequest request);
     }
 }

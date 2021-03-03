@@ -54,7 +54,7 @@ namespace CardsAgainstWhatever.Server.Services
 
             foreach (var player in game.Players)
             {
-                cardsToDeal.Add(player, game.CardDeck.PickUpAnswers(10 - player.CardsInHand.Count));
+                cardsToDeal.Add(player, game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count));
             }
 
             return cardsToDeal;

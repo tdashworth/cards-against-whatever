@@ -38,10 +38,12 @@ namespace CardsAgainstWhatever.Server.Hubs
             };
         }
 
-        public async Task StartRound(string gameCode)
+        public async Task StartRound(StartRoundRequest request)
         {
-            var cardsToDeal = await GameService.StartRound(gameCode);
-            await Task.WhenAll(cardsToDeal.Select(kvp => Clients.Client(kvp.Key.ConnectionId).NewRound(kvp.Value)));
+            var cardsToDeal = await GameService.StartRound(request.GameCode);
+            await Task.WhenAll(cardsToDeal.Select(kvp
+                => Clients.Client(kvp.Key.ConnectionId).NewRound(new NewRoundEvent { DealtCards = kvp.Value })
+            ));
         }
 
 

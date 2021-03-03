@@ -44,6 +44,6 @@
 
     async Task StartRound()
     {
-        await HubConnection.SendAsync(nameof(IGameServer.StartRound), GameState.Code);
+        await HubConnection.SendAsync(nameof(IGameServer.StartRound), new StartRoundRequest { GameCode = GameState.Code });
     }
 }

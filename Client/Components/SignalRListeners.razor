@@ -7,7 +7,7 @@
     {
         HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), (NewPlayerEvent newPlayerEvent) => GameState.AddPlayer(newPlayerEvent.NewPlayer));
 
-        HubConnection.On<List<AnswerCard>>(nameof(IGameClient.NewRound), (List<AnswerCard> cards) => GameState.AddCards(cards));
+        HubConnection.On<NewRoundEvent>(nameof(IGameClient.NewRound), (NewRoundEvent newRoundEvent) => GameState.AddCards(newRoundEvent.DealtCards));
 
         await HubConnection.StartAsync();
     }
