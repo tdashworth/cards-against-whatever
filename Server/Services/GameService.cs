@@ -1,7 +1,11 @@
-﻿using CardsAgainstWhatever.Server.Models;
+﻿using CardsAgainstWhatever.Server.Hubs;
+using CardsAgainstWhatever.Server.Models;
 using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
+using CardsAgainstWhatever.Shared.Dtos;
+using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +15,13 @@ namespace CardsAgainstWhatever.Server.Services
 {
     public class GameService : IGameService
     {
+        private readonly IHubContext<GameHub, IGameClient> hubContext;
         private readonly IGameRepositoy gameRepositoy;
 
-        public GameService(IGameRepositoy gameRepositoy)
+        public GameService(IGameRepositoy gameRepositoy, IHubContext<GameHub, IGameClient> hubContext)
         {
             this.gameRepositoy = gameRepositoy;
+            this.hubContext = hubContext;
         }
 
         public Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards)
@@ -35,6 +41,8 @@ namespace CardsAgainstWhatever.Server.Services
             var player = new ServerPlayer { Username = username, ConnectionId = connectionId };
 
             game.Players.Add(player);
+            await hubContext.Groups.AddToGroupAsync(connectionId, gameCode);
+            await hubContext.Clients.GroupExcept(gameCode, new[] { connectionId }).NewPlayer(new NewPlayerEvent { NewPlayer = player });
 
             return player;
         }
@@ -45,19 +53,29 @@ namespace CardsAgainstWhatever.Server.Services
             var player = game.Players.Find(p => p.Username == username);
 
             game.Players.Remove(player);
+            await hubContext.Groups.RemoveFromGroupAsync(player.ConnectionId, gameCode);
+            // TODO PlayerLeftEvent
         }
 
-        public async Task<Dictionary<ServerPlayer, List<AnswerCard>>> StartRound(string gameCode)
+        public async Task StartRound(string gameCode)
         {
             var game = await gameRepositoy.GetByCode(gameCode);
-            var cardsToDeal = new Dictionary<ServerPlayer, List<AnswerCard>>();
+            game.IncrementRoundNumber();
+            game.SelectNextCardCzar();
+            game.SelectNextQuestion();
 
-            foreach (var player in game.Players)
+            await Task.WhenAll(game.Players.Select(player =>
             {
-                cardsToDeal.Add(player, game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count));
-            }
-
-            return cardsToDeal;
+                var newCards = game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count);
+                player.CardsInHand.AddRange(newCards);
+                return hubContext.Clients.Client(player.ConnectionId).NewRound(new NewRoundEvent
+                {
+                    DealtCards = newCards,
+                    QuestionCard = game.CurrentQuestion,
+                    RoundNumber = game.RoundNumber,
+                    CardCzar = game.CurrentCardCzar,
+                });
+            }));
         }
     }
 }

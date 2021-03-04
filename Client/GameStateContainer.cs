@@ -12,6 +12,7 @@ namespace CardsAgainstWhatever.Client
         New,
         Joined,
         PickAnswerCards,
+        AwaitAnswerCards
     }
 
     public class GameStateContainer
@@ -19,8 +20,11 @@ namespace CardsAgainstWhatever.Client
         public GameState State { get; private set; } = GameState.New;
         public string Code { get; private set; }
         public string Username { get; private set; }
+        public int RoundNumber { get; private set; }
         public List<Player> Players { get; private set; } = new();
         public List<AnswerCard> CardsInHand { get; private set; } = new();
+        public QuestionCard QuestionCard { get; private set; }
+        public Player CardCzar { get; private set; }
 
         public event Action OnChange;
 
@@ -39,10 +43,13 @@ namespace CardsAgainstWhatever.Client
             NotifyStateChanged();
         }
 
-        public void AddCards(List<AnswerCard> cards)
+        public void NewRound(int roundNumber, Player cardCzar, QuestionCard question, List<AnswerCard> cards)
         {
+            RoundNumber = roundNumber;
+            CardCzar = cardCzar;
+            QuestionCard = question;
             CardsInHand.AddRange(cards);
-            State = GameState.PickAnswerCards;
+            State = CardCzar.Username == Username ? GameState.AwaitAnswerCards : GameState.PickAnswerCards;
             NotifyStateChanged();
         }
 

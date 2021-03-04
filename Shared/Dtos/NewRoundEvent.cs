@@ -12,5 +12,6 @@ namespace CardsAgainstWhatever.Shared.Dtos
         public int RoundNumber { get; set; }
         public List<AnswerCard> DealtCards { get; set; }
         public QuestionCard QuestionCard { get; set; }
+        public Player CardCzar { get; set; }
     }
 }

@@ -17,6 +17,10 @@ else if (GameState.State == Client.GameState.PickAnswerCards)
 {
     <GameBoard />
 }
+else if (GameState.State == Client.GameState.AwaitAnswerCards)
+{
+    <p>You're the CardCzar!</p>
+}
 
 
 @code {

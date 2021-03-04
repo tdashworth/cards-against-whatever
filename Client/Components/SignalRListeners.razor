@@ -1,13 +1,18 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
-@inject GameStateContainer GameState
+@inject GameStateContainer GameStateContainer
 
 @code {
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), (NewPlayerEvent newPlayerEvent) => GameState.AddPlayer(newPlayerEvent.NewPlayer));
+        HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), (NewPlayerEvent newPlayerEvent) => GameStateContainer.AddPlayer(newPlayerEvent.NewPlayer));
 
-        HubConnection.On<NewRoundEvent>(nameof(IGameClient.NewRound), (NewRoundEvent newRoundEvent) => GameState.AddCards(newRoundEvent.DealtCards));
+        HubConnection.On<NewRoundEvent>(nameof(IGameClient.NewRound), (NewRoundEvent newRoundEvent) => GameStateContainer.NewRound(
+            newRoundEvent.RoundNumber,
+            newRoundEvent.CardCzar,
+            newRoundEvent.QuestionCard,
+            newRoundEvent.DealtCards
+            ));
 
         await HubConnection.StartAsync();
     }

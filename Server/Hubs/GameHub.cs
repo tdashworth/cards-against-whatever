@@ -28,25 +28,14 @@ namespace CardsAgainstWhatever.Server.Hubs
 
         public async Task<JoinGameResponse> JoinGame(JoinGameRequest request)
         {
-            var player = await GameService.Join(request.GameCode, request.Username, Context.ConnectionId);
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, request.GameCode);
-            await Clients.OthersInGroup(request.GameCode).NewPlayer(new NewPlayerEvent { NewPlayer = player });
+            await GameService.Join(request.GameCode, request.Username, Context.ConnectionId);
 
             return new JoinGameResponse { 
                 ExistingPlayersInGame = await GameService.GetPlayers(request.GameCode) 
             };
         }
 
-        public async Task StartRound(StartRoundRequest request)
-        {
-            var cardsToDeal = await GameService.StartRound(request.GameCode);
-            await Task.WhenAll(cardsToDeal.Select(kvp
-                => Clients.Client(kvp.Key.ConnectionId).NewRound(new NewRoundEvent { DealtCards = kvp.Value })
-            ));
-        }
-
-
+        public Task StartRound(StartRoundRequest request) => GameService.StartRound(request.GameCode);
 
     }
 }
