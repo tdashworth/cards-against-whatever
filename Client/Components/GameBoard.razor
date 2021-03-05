@@ -1,25 +1,93 @@
-﻿@inject GameStateContainer GameState
+﻿@inject GameStateContainer GameStateContainer
 
+<div id="game-board" class="p-4">
 
-<div class="card-deck">
-    @foreach (var card in GameState.CardsInHand)
-    {
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">@card.Text</h5>
+    <section class="card" style="grid-column: 1 / 2; grid-row: 1;">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <b>Cards Against Whatever!</b>
+            <button type="button" class="btn btn-sm btn-danger">Leave</button>
+        </div>
+        <div class="card-body">
+            <p>Game Code: <b>@GameStateContainer.Code</b></p>
+            <p>Username: <b>@GameStateContainer.Username</b></p>
+            <p>
+                <hr>
+            </p>
+            <p>Round: <b>@GameStateContainer.RoundNumber</b></p>
+            <p>Card Czar: <b>@GameStateContainer.CardCzar.Username</b></p>
+            <p>
+                <hr>
+            </p>
+        </div>
+        <div class="card-footer bg-white">
+            <button type="button" class="btn btn-primary w-100" disabled>Primary</button>
+        </div>
+    </section>
+
+    <section class="card" style="grid-column: 2 / 3; grid-row: 1;">
+        <div class="card-body">
+            <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
+                <div class="dummy"></div>
+                <header class="game-card-header">
+                    <h3>@GameStateContainer.QuestionCard.Text</h3>
+                </header>
+
+                @if (GameStateContainer.QuestionCard.Picks > 1)
+                {
+                    <div class="game-card-footer">
+                        <span>Pick @GameStateContainer.QuestionCard.Picks</span>
+                    </div>
+                }
+            </article>
+
+        </div>
+    </section>
+
+    <section class="card" style="grid-column: 3 / 4; grid-row: 1;">
+        <div class="card-header">
+            <b>Players</b>
+        </div>
+        <ul class="list-group list-group-flush" style="overflow-y: auto;">
+            @foreach (var player in GameStateContainer.Players)
+            {
+                <li class="list-group-item">@player.Username<span class="float-right">#</span></li>
+            }
+            <li class="list-group-item"></li>
+        </ul>
+    </section>
+
+    <section class="card" style="grid-column: 1 / 4; grid-row: 2;">
+        <!-- Cards In Hand -->
+        <div class="card-header">
+            <b>Your Hand</b>
+        </div>
+        <div class="card-body p-0">
+            <div class="game-card-list">
+                @foreach (var card in GameStateContainer.CardsInHand)
+                {
+                    <article class="game-card answer-card">
+                        <div class="dummy"></div>
+                        <header class="game-card-header">
+                            <h3>@card.Text</h3>
+                        </header>
+                        @if (false) // TODO
+                        {
+                            <div class="game-card-footer">
+                                <span>Picked</span>
+                            </div>
+                        }
+                    </article>
+                }
             </div>
         </div>
-    }
+    </section>
 </div>
-
-
-
 
 @code {
 
     protected override async Task OnInitializedAsync()
     {
-        GameState.OnChange += StateHasChanged;
+        GameStateContainer.OnChange += StateHasChanged;
     }
 
 }
