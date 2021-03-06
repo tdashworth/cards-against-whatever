@@ -18,6 +18,7 @@ namespace CardsAgainstWhatever.Client
     public class GameStateContainer
     {
         public GameState State { get; private set; } = GameState.New;
+        public ActionButtonState ActionButton { get; private set; } = new();
         public string Code { get; private set; }
         public string Username { get; private set; }
         public int RoundNumber { get; private set; }
@@ -54,5 +55,13 @@ namespace CardsAgainstWhatever.Client
         }
 
         private void NotifyStateChanged() => OnChange?.Invoke();
+
+        public class ActionButtonState
+        {
+            public string ButtonText { get; set; }
+            public bool IsEnabled { get; set; }
+            public string ButtonMessage { get; set; }
+            public Action OnClick { get; set; }
+        }
     }
 }

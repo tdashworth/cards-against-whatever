@@ -20,7 +20,13 @@
             </p>
         </div>
         <div class="card-footer bg-white">
-            <button type="button" class="btn btn-primary w-100" disabled>Primary</button>
+            <button type="button"
+                    class="btn btn-primary w-100"
+                    @onclick="() => GameStateContainer.ActionButton?.OnClick()"
+                    disabled="@(!GameStateContainer.ActionButton.IsEnabled)">
+                @GameStateContainer.ActionButton.ButtonText
+            </button>
+            <p>@GameStateContainer.ActionButton.ButtonMessage</p>
         </div>
     </section>
 
@@ -65,12 +71,12 @@
             <div class="game-card-list">
                 @foreach (var card in GameStateContainer.CardsInHand)
                 {
-                    <article class="game-card answer-card">
+                    <article class="game-card answer-card" @onclick="() => OnCardSelected(card)">
                         <div class="dummy"></div>
                         <header class="game-card-header">
                             <h3>@card.Text</h3>
                         </header>
-                        @if (false) // TODO
+                        @if (SelectedCards.Contains(card))
                         {
                             <div class="game-card-footer">
                                 <span>Picked</span>
@@ -84,10 +90,38 @@
 </div>
 
 @code {
+    List<AnswerCard> SelectedCards = new();
+    bool IsSinglePickQuestion { get => GameStateContainer.QuestionCard.Picks == 1; }
+    bool HasSelectedRequiredCards { get => SelectedCards.Count == GameStateContainer.QuestionCard.Picks; }
 
     protected override async Task OnInitializedAsync()
     {
         GameStateContainer.OnChange += StateHasChanged;
+    }
+
+    void OnCardSelected(AnswerCard card)
+    {
+        if (IsSinglePickQuestion)
+        {
+            SelectedCards.Clear();
+            SelectedCards.Add(card);
+        } else
+        {
+            if (SelectedCards.Contains(card))
+            {
+                SelectedCards.Remove(card);
+            }
+            else if (SelectedCards.Count < GameStateContainer.QuestionCard.Picks)
+            {
+                SelectedCards.Add(card);
+            }
+        }
+
+        GameStateContainer.ActionButton.IsEnabled = HasSelectedRequiredCards;
+        GameStateContainer.ActionButton.ButtonText = "Play selected cards";
+        GameStateContainer.ActionButton.ButtonMessage = HasSelectedRequiredCards
+            ? string.Empty
+            : $"Select {GameStateContainer.QuestionCard.Picks} card(s)";
     }
 
 }
