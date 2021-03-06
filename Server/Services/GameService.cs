@@ -16,13 +16,13 @@ namespace CardsAgainstWhatever.Server.Services
 {
     public class GameService : IGameService
     {
-        private readonly IHubContext<GameHub, IGameClient> hubContext;
         private readonly IGameRepositoy gameRepositoy;
+        private readonly IHubContextFascade<IGameClient> hubContextFascade;
 
-        public GameService(IGameRepositoy gameRepositoy, IHubContext<GameHub, IGameClient> hubContext)
+        public GameService(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
         {
             this.gameRepositoy = gameRepositoy;
-            this.hubContext = hubContext;
+            this.hubContextFascade = hubContextFascade;
         }
 
         public Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards)
@@ -42,8 +42,8 @@ namespace CardsAgainstWhatever.Server.Services
             var player = new ServerPlayer { Username = username, ConnectionId = connectionId, State = PlayerState.InLobby };
 
             game.Players.Add(player);
-            await hubContext.Groups.AddToGroupAsync(connectionId, gameCode);
-            await hubContext.Clients.GroupExcept(gameCode, new[] { connectionId }).NewPlayer(new PlayerJoinedEvent { NewPlayer = player });
+            await hubContextFascade.JoinGroup(gameCode, connectionId);
+            await hubContextFascade.GetGroup(gameCode).NewPlayer(new PlayerJoinedEvent { NewPlayer = player });
 
             return player;
         }
@@ -54,7 +54,7 @@ namespace CardsAgainstWhatever.Server.Services
             var player = game.Players.Find(p => p.Username == username);
 
             game.Players.Remove(player);
-            await hubContext.Groups.RemoveFromGroupAsync(player.ConnectionId, gameCode);
+            await hubContextFascade.LeaveGroup(gameCode, player.ConnectionId);
             // TODO PlayerLeftEvent
         }
 
@@ -72,7 +72,7 @@ namespace CardsAgainstWhatever.Server.Services
                 player.PlayedCards.Clear();
                 player.State = PlayerState.PlayingMove;
 
-                return hubContext.Clients.Client(player.ConnectionId).NewRound(new RoundStartedEvent
+                return hubContextFascade.GetClient(player.ConnectionId).NewRound(new RoundStartedEvent
                 {
                     DealtCards = newCards,
                     QuestionCard = game.CurrentQuestion,
@@ -86,7 +86,7 @@ namespace CardsAgainstWhatever.Server.Services
         {
             var game = await gameRepositoy.GetByCode(gameCode);
             var player = game.Players.Find(player => player.Username == username);
-            var gameGroupClient = hubContext.Clients.Group(gameCode);
+            var gameGroupClient = hubContextFascade.GetGroup(gameCode);
 
             if (player == null)
             {
