@@ -18,7 +18,7 @@
         <label for="card-pack-file" class="col-form-label">Card Pack</label>
         <div class="custom-file">
             <InputFile OnChange="OnCardsFileSelection" class="custom-file-input" accept=".csv" />
-            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+            <label class="custom-file-label" for="inputGroupFile01">@(CreateModel.FileName ?? "Choose file")</label>
         </div>
     </div>
 
@@ -38,6 +38,8 @@
         [Required]
         [StringLength(10, ErrorMessage = "Name is too long.")]
         public string Username { get; set; }
+
+        public string FileName { get; set; }
 
         public List<QuestionCard> Questions = new();
 
@@ -68,6 +70,7 @@
                 CreateModel.Answers.Add(new AnswerCard(card.Text));
             }
         }
+        CreateModel.FileName = e.File.Name;
     }
 
     public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
