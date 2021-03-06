@@ -1,6 +1,7 @@
 using CardsAgainstWhatever.Server.Hubs;
 using CardsAgainstWhatever.Server.Services;
 using CardsAgainstWhatever.Server.Services.Interfaces;
+using CardsAgainstWhatever.Shared.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,6 +32,7 @@ namespace CardsAgainstWhatever.Server
 
             services.AddScoped<IGameRepositoy, GameRepository>();
             services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IHubContextFascade<IGameClient>, HubContextFascade<GameHub, IGameClient>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

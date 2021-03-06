@@ -38,7 +38,7 @@ namespace CardsAgainstWhatever.Client
             Code = code;
             Username = username;
             State = GameState.Joined;
-            Players.AddRange(players);
+            Players.AddRange(players.Where(p => p.Username != Username));
             NotifyStateChanged();
         }
 
