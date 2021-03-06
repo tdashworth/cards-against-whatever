@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Shared.Dtos.Actions
 {
-    public class PlayMoveAction
+    public class PlayMovePlayerAction
     {
         public string GameCode { get;  set; }
         public string Username { get; set; }

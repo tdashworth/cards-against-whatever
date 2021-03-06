@@ -5,12 +5,13 @@ namespace CardsAgainstWhatever.Shared.Interfaces
 {
     public interface IGameClient
     {
-        Task NewPlayer(PlayerJoinedEvent newPlayer);
+        Task PlayerJoined(PlayerJoinedEvent playerJoinedEvent);
 
-        Task NewRound(RoundStartedEvent newRound);
+        Task RoundStarted(RoundStartedEvent roundStartedEvent);
 
-        Task NewMovePlayed(PlayerMovedEvent newMovePlayedEvent);
+        Task PlayerMoved(PlayerMovedEvent playerMovedEvent);
 
-        Task AllMovesPlayed(RoundClosedEvent allMovesPlayedEvent);
+        Task RoundClosed(RoundClosedEvent roundClosedEvent); 
+        Task RoundEnded(RoundEndedEvent roundEndedEvent);
     }
 }

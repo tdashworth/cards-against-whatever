@@ -39,7 +39,9 @@ namespace CardsAgainstWhatever.Server.Hubs
 
         public Task StartRound(StartRoundAction startRoundEvent) => gameService.StartRound(startRoundEvent.GameCode);
 
-        public Task PlayMove(PlayMoveAction playCardsEvent) => gameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
+        public Task PlayPlayerMove(PlayMovePlayerAction playCardsEvent) => gameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
+
+        public Task PlayCardCzarMove(PlayMoveCardCzarAction pickWinningCardsEvent) => gameService.PickWinner(pickWinningCardsEvent.GameCode, pickWinningCardsEvent.WinningCards);
 
     }
 }

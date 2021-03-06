@@ -19,5 +19,6 @@ namespace CardsAgainstWhatever.Server.Services.Interfaces
         Task StartRound(string gameCode);
 
         Task PlayCards(string gameCode, string username, List<AnswerCard> playedCards);
+        Task PickWinner(string gameCode, List<AnswerCard> winningCards);
     }
 }

@@ -43,7 +43,7 @@ namespace CardsAgainstWhatever.Server.Services
 
             game.Players.Add(player);
             await hubContextFascade.JoinGroup(gameCode, connectionId);
-            await hubContextFascade.GetGroup(gameCode).NewPlayer(new PlayerJoinedEvent { NewPlayer = player });
+            await hubContextFascade.GetGroup(gameCode).PlayerJoined(new PlayerJoinedEvent { NewPlayer = player });
 
             return player;
         }
@@ -72,7 +72,7 @@ namespace CardsAgainstWhatever.Server.Services
                 player.PlayedCards.Clear();
                 player.State = PlayerState.PlayingMove;
 
-                return hubContextFascade.GetClient(player.ConnectionId).NewRound(new RoundStartedEvent
+                return hubContextFascade.GetClient(player.ConnectionId).RoundStarted(new RoundStartedEvent
                 {
                     DealtCards = newCards,
                     QuestionCard = game.CurrentQuestion,
@@ -96,7 +96,7 @@ namespace CardsAgainstWhatever.Server.Services
             player.PlayedCards = playedCards;
             player.State = PlayerState.MovePlayed;
 
-            await gameGroupClient.NewMovePlayed(new PlayerMovedEvent { Username = username });
+            await gameGroupClient.PlayerMoved(new PlayerMovedEvent { Username = username });
 
             var allPlayersMadeMove = game.Players
                 .Where(player => player != game.CurrentCardCzar)
@@ -104,11 +104,30 @@ namespace CardsAgainstWhatever.Server.Services
 
             if (allPlayersMadeMove)
             {
-                await gameGroupClient.AllMovesPlayed(new RoundClosedEvent
+                await gameGroupClient.RoundClosed(new RoundClosedEvent
                 {
                     PlayedCardsGroupedPerPlayer = game.Players.Select(player => player.PlayedCards).ToList()
                 });
             }
+        }
+
+        public async Task PickWinner(string gameCode, List<AnswerCard> winningCards)
+        {
+            var game = await gameRepositoy.GetByCode(gameCode);
+            var gameGroupClient = hubContextFascade.GetGroup(gameCode);
+            var winner = game.Players.Find(player => player.CardsInHand.All(card => winningCards.Contains(card)));
+
+            if (winner == null)
+            {
+                throw new Exception($"Winner could not be determined in game {gameCode}.");
+            }
+
+            winner.WonCards.Add(game.CurrentQuestion);
+
+            await gameGroupClient.RoundEnded(new RoundEndedEvent
+            {
+                Winner = winner
+            });
         }
     }
 }

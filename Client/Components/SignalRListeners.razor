@@ -6,14 +6,20 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<PlayerJoinedEvent>(nameof(IGameClient.NewPlayer), newPlayerEvent
+        HubConnection.On<PlayerJoinedEvent>(nameof(IGameClient.PlayerJoined), newPlayerEvent
             => GameStateContainer.AddPlayer(newPlayerEvent.NewPlayer));
 
-        HubConnection.On<RoundStartedEvent>(nameof(IGameClient.NewRound), newRoundEvent
+        HubConnection.On<RoundStartedEvent>(nameof(IGameClient.RoundStarted), newRoundEvent
             => GameStateContainer.NewRound(newRoundEvent.RoundNumber, newRoundEvent.CardCzar, newRoundEvent.QuestionCard, newRoundEvent.DealtCards));
 
-        HubConnection.On<PlayerMovedEvent>(nameof(IGameClient.NewMovePlayed), newMovePlayedEvent
+        HubConnection.On<PlayerMovedEvent>(nameof(IGameClient.PlayerMoved), newMovePlayedEvent
             => GameStateContainer.MovePlayed(newMovePlayedEvent.Username));
+
+        HubConnection.On<RoundClosedEvent>(nameof(IGameClient.RoundClosed), roundClosedEvent
+            => GameStateContainer.RoundClosed(roundClosedEvent.PlayedCardsGroupedPerPlayer));
+
+        HubConnection.On<RoundEndedEvent>(nameof(IGameClient.RoundEnded), roundEndedEvent
+            => GameStateContainer.RoundEnded(roundEndedEvent.Winner));
 
         await HubConnection.StartAsync();
     }

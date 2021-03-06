@@ -16,38 +16,43 @@
                 <hr>
             </p>
             <p>Round: <b>@GameStateContainer.RoundNumber</b></p>
-            <p>Card Czar: <b>@GameStateContainer.CardCzar.Username</b></p>
+            <p>Card Czar: <b>@GameStateContainer.CardCzar?.Username</b></p>
             <p>
                 <hr>
             </p>
         </div>
-        <div class="card-footer bg-white">
-            <button type="button"
-                    class="btn btn-primary w-100"
-                    @onclick="() => GameStateContainer.ActionButton?.OnClick()"
-                    disabled="@(!GameStateContainer.ActionButton.IsEnabled)">
-                @GameStateContainer.ActionButton.ButtonText
-            </button>
-            <p>@GameStateContainer.ActionButton.ButtonMessage</p>
-        </div>
+        @if (GameStateContainer.ActionButton?.ButtonText != string.Empty)
+        {
+            <div class="card-footer bg-white">
+                <button type="button"
+                        class="btn btn-primary w-100"
+                        @onclick="() => OnButtonClick()"
+                        disabled="@(!GameStateContainer.ActionButton.IsEnabled)">
+                    @GameStateContainer.ActionButton.ButtonText
+                </button>
+                <p>@GameStateContainer.ActionButton.ButtonMessage</p>
+            </div>
+        }
     </section>
 
     <section class="card" style="grid-column: 2 / 3; grid-row: 1;">
         <div class="card-body">
-            <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
-                <div class="dummy"></div>
-                <header class="game-card-header">
-                    <h3>@GameStateContainer.QuestionCard.Text</h3>
-                </header>
+            @if (GameStateContainer.QuestionCard != null)
+            {
+                <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
+                    <div class="dummy"></div>
+                    <header class="game-card-header">
+                        <h3>@GameStateContainer.QuestionCard.Text</h3>
+                    </header>
 
-                @if (GameStateContainer.QuestionCard.Picks > 1)
-                {
-                    <div class="game-card-footer">
-                        <span>Pick @GameStateContainer.QuestionCard.Picks</span>
-                    </div>
-                }
-            </article>
-
+                    @if (GameStateContainer.QuestionCard.Picks > 1)
+                    {
+                        <div class="game-card-footer">
+                            <span>Pick @GameStateContainer.QuestionCard.Picks</span>
+                        </div>
+                    }
+                </article>
+            }
         </div>
     </section>
 
@@ -99,23 +104,44 @@
     protected override async Task OnInitializedAsync()
     {
         GameStateContainer.OnChange += StateHasChanged;
+    }
 
-        GameStateContainer.ActionButton.OnClick = async () =>
+    async void OnButtonClick()
+    {
+        if (GameStateContainer.State == GameState.PickAnswerCards)
         {
             GameStateContainer.PlayMove(SelectedCards);
-            await HubConnection.SendAsync(nameof(IGameServer.PlayMove), new PlayMoveAction
+            await HubConnection.SendAsync(nameof(IGameServer.PlayPlayerMove), new PlayMovePlayerAction
             {
                 GameCode = GameStateContainer.Code,
                 Username = GameStateContainer.Username,
                 PlayedCards = GameStateContainer.CardsSelected
             });
-        };
+        }
 
-        StateHasChanged();
+        if (GameStateContainer.State == GameState.PickWinner)
+        {
+            await HubConnection.SendAsync(nameof(IGameServer.PlayCardCzarMove), new PlayMoveCardCzarAction
+            {
+                GameCode = GameStateContainer.Code,
+                Username = GameStateContainer.Username,
+                WinningCards = GameStateContainer.CardsSelected
+            });
+        }
+
+        if (GameStateContainer.State == GameState.Joined)
+        {
+            await HubConnection.SendAsync(nameof(IGameServer.StartRound), new StartRoundAction
+            {
+                GameCode = GameStateContainer.Code
+            });
+        }
     }
 
     void OnCardSelected(AnswerCard card)
     {
+        if (GameStateContainer.IsCardCzar) return;
+
         if (IsSinglePickQuestion)
         {
             SelectedCards.Clear();
