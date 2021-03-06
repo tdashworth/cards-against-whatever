@@ -3,6 +3,7 @@
 @using CsvHelper
 @using CsvHelper.Configuration
 @using System.ComponentModel.DataAnnotations;
+@using CardsAgainstWhatever.Shared.Dtos.Events
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
 @inject GameStateContainer GameState
@@ -79,12 +80,13 @@
     {
         try
         {
-            var createResponse = await HubConnection.InvokeAsync<CreateGameResponse>(nameof(IGameServer.CreateGame), new CreateGameRequest {
+            var createResponse = await HubConnection.InvokeAsync<GameCreatedEvent>(nameof(IGameServer.CreateGame), new CreateGameAction
+            {
                 QuestionCards = CreateModel.Questions,
                 AnswerCards = CreateModel.Answers
             });
 
-            var joinResponse = await HubConnection.InvokeAsync<JoinGameResponse>(nameof(IGameServer.JoinGame), new JoinGameRequest
+            var joinResponse = await HubConnection.InvokeAsync<GameJoinedEvent>(nameof(IGameServer.JoinGame), new JoinGameAction
             {
                 GameCode = createResponse.GameCode,
                 Username = CreateModel.Username
@@ -92,7 +94,7 @@
 
             GameState.JoinGame(createResponse.GameCode, CreateModel.Username, joinResponse.ExistingPlayersInGame);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             //TODO
         }

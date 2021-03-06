@@ -103,7 +103,7 @@
         GameStateContainer.ActionButton.OnClick = async () =>
         {
             GameStateContainer.PlayMove(SelectedCards);
-            await HubConnection.SendAsync(nameof(IGameServer.PlayMove), new PlayMoveEvent
+            await HubConnection.SendAsync(nameof(IGameServer.PlayMove), new PlayMoveAction
             {
                 GameCode = GameStateContainer.Code,
                 Username = GameStateContainer.Username,

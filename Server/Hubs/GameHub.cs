@@ -1,6 +1,8 @@
-using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
 using CardsAgainstWhatever.Shared.Dtos;
+using CardsAgainstWhatever.Shared.Dtos.Actions;
+using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -21,21 +23,23 @@ namespace CardsAgainstWhatever.Server.Hubs
             GameService = gameService;
         }
 
-        public async Task<CreateGameResponse> CreateGame(CreateGameRequest request)
-            => new CreateGameResponse { 
+        public async Task<GameCreatedEvent> CreateGame(CreateGameAction request)
+            => new GameCreatedEvent { 
                 GameCode = await GameService.Create(request.QuestionCards, request.AnswerCards) 
             };
 
-        public async Task<JoinGameResponse> JoinGame(JoinGameRequest request)
+        public async Task<GameJoinedEvent> JoinGame(JoinGameAction request)
         {
             await GameService.Join(request.GameCode, request.Username, Context.ConnectionId);
 
-            return new JoinGameResponse { 
+            return new GameJoinedEvent { 
                 ExistingPlayersInGame = await GameService.GetPlayers(request.GameCode) 
             };
         }
 
-        public Task PlayMove(PlayMoveEvent playCardsEvent) => GameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
+        public Task StartRound(StartRoundAction startRoundEvent) => GameService.StartRound(startRoundEvent.GameCode);
+
+        public Task PlayMove(PlayMoveAction playCardsEvent) => GameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
 
     }
 }

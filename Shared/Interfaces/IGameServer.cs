@@ -1,17 +1,14 @@
-using CardsAgainstWhatever.Shared.Dtos;
-using CardsAgainstWhatever.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using CardsAgainstWhatever.Shared.Dtos.Actions;
+using CardsAgainstWhatever.Shared.Dtos.Events;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Shared.Interfaces
 {
     public interface IGameServer
     {
-        Task<CreateGameResponse> CreateGame(CreateGameRequest request);
-        Task<JoinGameResponse> JoinGame(JoinGameRequest request);
-        Task PlayMove(PlayMoveEvent playCardsEvent);
+        Task<GameCreatedEvent> CreateGame(CreateGameAction request);
+        Task<GameJoinedEvent> JoinGame(JoinGameAction request);
+        Task StartRound(StartRoundAction startRoundEvent);
+        Task PlayMove(PlayMoveAction playCardsEvent);
     }
 }

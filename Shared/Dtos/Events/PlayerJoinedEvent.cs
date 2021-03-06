@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Events
 {
-    public class JoinGameResponse
+    public class PlayerJoinedEvent
     {
-        public List<Player> ExistingPlayersInGame { get; set; }
+        public Player NewPlayer { get; set; }
     }
 }

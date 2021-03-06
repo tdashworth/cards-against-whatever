@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Events
 {
-    public class AllMovesPlayedEvent
+    public class RoundClosedEvent
     {
         public List<List<AnswerCard>> PlayedCardsGroupedPerPlayer { get; set; }
     }

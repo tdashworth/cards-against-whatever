@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Events
 {
-    public class NewRoundEvent
+    public class RoundStartedEvent
     {
         public int RoundNumber { get; set; }
         public List<AnswerCard> DealtCards { get; set; }

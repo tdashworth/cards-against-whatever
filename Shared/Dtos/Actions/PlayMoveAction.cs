@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Actions
 {
-    public class PlayMoveEvent
+    public class PlayMoveAction
     {
         public string GameCode { get;  set; }
         public string Username { get; set; }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Actions
 {
-    public class JoinGameRequest
+    public class JoinGameAction
     {
         public string GameCode { get; set; }
         public string Username { get; set; }

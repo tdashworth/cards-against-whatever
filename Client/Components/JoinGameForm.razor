@@ -1,4 +1,5 @@
 ﻿@using System.ComponentModel.DataAnnotations;
+@using CardsAgainstWhatever.Shared.Dtos.Events
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
 @inject GameStateContainer GameState
@@ -42,7 +43,7 @@
     {
         try
         {
-            var joinResponse = await HubConnection.InvokeAsync<JoinGameResponse>(nameof(IGameServer.JoinGame), new JoinGameRequest
+            var joinResponse = await HubConnection.InvokeAsync<GameJoinedEvent>(nameof(IGameServer.JoinGame), new JoinGameAction
             {
                 GameCode = JoinModel.GameCode,
                 Username = JoinModel.Username
@@ -50,7 +51,7 @@
 
             GameState.JoinGame(JoinModel.GameCode, JoinModel.Username, joinResponse.ExistingPlayersInGame);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             //TODO
         }

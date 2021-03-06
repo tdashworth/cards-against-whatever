@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Events
 {
-    public class NewMovePlayedEvent
+    public class PlayerMovedEvent
     {
         public string Username { get; set; }
     }

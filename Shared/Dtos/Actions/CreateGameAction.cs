@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CardsAgainstWhatever.Shared.Dtos
+namespace CardsAgainstWhatever.Shared.Dtos.Actions
 {
-    public class CreateGameRequest
+    public class CreateGameAction
     {
         public List<QuestionCard> QuestionCards { get; set; }
         public List<AnswerCard> AnswerCards { get; set; }

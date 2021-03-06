@@ -3,6 +3,7 @@ using CardsAgainstWhatever.Server.Models;
 using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
 using CardsAgainstWhatever.Shared.Dtos;
+using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -42,7 +43,7 @@ namespace CardsAgainstWhatever.Server.Services
 
             game.Players.Add(player);
             await hubContext.Groups.AddToGroupAsync(connectionId, gameCode);
-            await hubContext.Clients.GroupExcept(gameCode, new[] { connectionId }).NewPlayer(new NewPlayerEvent { NewPlayer = player });
+            await hubContext.Clients.GroupExcept(gameCode, new[] { connectionId }).NewPlayer(new PlayerJoinedEvent { NewPlayer = player });
 
             return player;
         }
@@ -71,7 +72,7 @@ namespace CardsAgainstWhatever.Server.Services
                 player.PlayedCards.Clear();
                 player.State = PlayerState.PlayingMove;
 
-                return hubContext.Clients.Client(player.ConnectionId).NewRound(new NewRoundEvent
+                return hubContext.Clients.Client(player.ConnectionId).NewRound(new RoundStartedEvent
                 {
                     DealtCards = newCards,
                     QuestionCard = game.CurrentQuestion,
@@ -95,7 +96,7 @@ namespace CardsAgainstWhatever.Server.Services
             player.PlayedCards = playedCards;
             player.State = PlayerState.MovePlayed;
 
-            await gameGroupClient.NewMovePlayed(new NewMovePlayedEvent { Username = username });
+            await gameGroupClient.NewMovePlayed(new PlayerMovedEvent { Username = username });
 
             var allPlayersMadeMove = game.Players
                 .Where(player => player != game.CurrentCardCzar)
@@ -103,7 +104,7 @@ namespace CardsAgainstWhatever.Server.Services
 
             if (allPlayersMadeMove)
             {
-                await gameGroupClient.AllMovesPlayed(new AllMovesPlayedEvent
+                await gameGroupClient.AllMovesPlayed(new RoundClosedEvent
                 {
                     PlayedCardsGroupedPerPlayer = game.Players.Select(player => player.PlayedCards).ToList()
                 });

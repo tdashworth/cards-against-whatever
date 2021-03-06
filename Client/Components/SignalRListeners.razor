@@ -1,22 +1,19 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
+@using CardsAgainstWhatever.Shared.Dtos.Events
 @inject HubConnection HubConnection
 @inject GameStateContainer GameStateContainer
 
 @code {
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), newPlayerEvent => GameStateContainer.AddPlayer(newPlayerEvent.NewPlayer));
+        HubConnection.On<PlayerJoinedEvent>(nameof(IGameClient.NewPlayer), newPlayerEvent
+            => GameStateContainer.AddPlayer(newPlayerEvent.NewPlayer));
 
-        HubConnection.On<NewRoundEvent>(nameof(IGameClient.NewRound), newRoundEvent => GameStateContainer.NewRound(
-            newRoundEvent.RoundNumber,
-            newRoundEvent.CardCzar,
-            newRoundEvent.QuestionCard,
-            newRoundEvent.DealtCards
-        ));
+        HubConnection.On<RoundStartedEvent>(nameof(IGameClient.NewRound), newRoundEvent
+            => GameStateContainer.NewRound(newRoundEvent.RoundNumber, newRoundEvent.CardCzar, newRoundEvent.QuestionCard, newRoundEvent.DealtCards));
 
-        HubConnection.On<NewMovePlayedEvent>(nameof(IGameClient.NewMovePlayed), newMovePlayedEvent => GameStateContainer.MovePlayed(
-            newMovePlayedEvent.Username
-        ));
+        HubConnection.On<PlayerMovedEvent>(nameof(IGameClient.NewMovePlayed), newMovePlayedEvent
+            => GameStateContainer.MovePlayed(newMovePlayedEvent.Username));
 
         await HubConnection.StartAsync();
     }
