@@ -13,5 +13,9 @@ namespace CardsAgainstWhatever.Shared.Interfaces
         Task NewPlayer(NewPlayerEvent newPlayer);
 
         Task NewRound(NewRoundEvent newRound);
+
+        Task NewMovePlayed(NewMovePlayedEvent newMovePlayedEvent);
+
+        Task AllMovesPlayed(AllMovesPlayedEvent allMovesPlayedEvent);
     }
 }

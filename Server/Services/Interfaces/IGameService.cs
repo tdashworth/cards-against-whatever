@@ -17,5 +17,7 @@ namespace CardsAgainstWhatever.Server.Services.Interfaces
         Task Leave(string gameCode, string username);
         Task<List<Player>> GetPlayers(string gameCode);
         Task StartRound(string gameCode);
+
+        Task PlayCards(string gameCode, string username, List<AnswerCard> playedCards);
     }
 }

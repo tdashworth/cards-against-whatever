@@ -1,4 +1,6 @@
-﻿@inject GameStateContainer GameStateContainer
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+@inject GameStateContainer GameStateContainer
 
 <div id="game-board" class="p-4">
 
@@ -56,7 +58,7 @@
         <ul class="list-group list-group-flush" style="overflow-y: auto;">
             @foreach (var player in GameStateContainer.Players)
             {
-                <li class="list-group-item">@player.Username<span class="float-right">#</span></li>
+                <li class="list-group-item">@player.Username<span class="float-right">@player.State.ToString()</span></li>
             }
             <li class="list-group-item"></li>
         </ul>
@@ -97,6 +99,19 @@
     protected override async Task OnInitializedAsync()
     {
         GameStateContainer.OnChange += StateHasChanged;
+
+        GameStateContainer.ActionButton.OnClick = async () =>
+        {
+            GameStateContainer.PlayMove(SelectedCards);
+            await HubConnection.SendAsync(nameof(IGameServer.PlayMove), new PlayMoveEvent
+            {
+                GameCode = GameStateContainer.Code,
+                Username = GameStateContainer.Username,
+                PlayedCards = GameStateContainer.CardsSelected
+            });
+        };
+
+        StateHasChanged();
     }
 
     void OnCardSelected(AnswerCard card)
@@ -105,7 +120,8 @@
         {
             SelectedCards.Clear();
             SelectedCards.Add(card);
-        } else
+        }
+        else
         {
             if (SelectedCards.Contains(card))
             {
@@ -118,7 +134,6 @@
         }
 
         GameStateContainer.ActionButton.IsEnabled = HasSelectedRequiredCards;
-        GameStateContainer.ActionButton.ButtonText = "Play selected cards";
         GameStateContainer.ActionButton.ButtonMessage = HasSelectedRequiredCards
             ? string.Empty
             : $"Select {GameStateContainer.QuestionCard.Picks} card(s)";

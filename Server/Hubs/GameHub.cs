@@ -1,4 +1,4 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
 using CardsAgainstWhatever.Shared.Dtos;
 using CardsAgainstWhatever.Shared.Interfaces;
@@ -35,7 +35,7 @@ namespace CardsAgainstWhatever.Server.Hubs
             };
         }
 
-        public Task StartRound(StartRoundRequest request) => GameService.StartRound(request.GameCode);
+        public Task PlayMove(PlayMoveEvent playCardsEvent) => GameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
 
     }
 }

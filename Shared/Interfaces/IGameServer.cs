@@ -1,4 +1,4 @@
-﻿using CardsAgainstWhatever.Shared.Dtos;
+using CardsAgainstWhatever.Shared.Dtos;
 using CardsAgainstWhatever.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,6 @@ namespace CardsAgainstWhatever.Shared.Interfaces
     {
         Task<CreateGameResponse> CreateGame(CreateGameRequest request);
         Task<JoinGameResponse> JoinGame(JoinGameRequest request);
-        Task StartRound(StartRoundRequest request);
+        Task PlayMove(PlayMoveEvent playCardsEvent);
     }
 }

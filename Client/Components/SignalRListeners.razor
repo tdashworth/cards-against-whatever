@@ -5,14 +5,18 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), (NewPlayerEvent newPlayerEvent) => GameStateContainer.AddPlayer(newPlayerEvent.NewPlayer));
+        HubConnection.On<NewPlayerEvent>(nameof(IGameClient.NewPlayer), newPlayerEvent => GameStateContainer.AddPlayer(newPlayerEvent.NewPlayer));
 
-        HubConnection.On<NewRoundEvent>(nameof(IGameClient.NewRound), (NewRoundEvent newRoundEvent) => GameStateContainer.NewRound(
+        HubConnection.On<NewRoundEvent>(nameof(IGameClient.NewRound), newRoundEvent => GameStateContainer.NewRound(
             newRoundEvent.RoundNumber,
             newRoundEvent.CardCzar,
             newRoundEvent.QuestionCard,
             newRoundEvent.DealtCards
-            ));
+        ));
+
+        HubConnection.On<NewMovePlayedEvent>(nameof(IGameClient.NewMovePlayed), newMovePlayedEvent => GameStateContainer.MovePlayed(
+            newMovePlayedEvent.Username
+        ));
 
         await HubConnection.StartAsync();
     }

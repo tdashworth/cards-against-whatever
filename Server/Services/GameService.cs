@@ -38,7 +38,7 @@ namespace CardsAgainstWhatever.Server.Services
         public async Task<Player> Join(string gameCode, string username, string connectionId)
         {
             var game = await gameRepositoy.GetByCode(gameCode);
-            var player = new ServerPlayer { Username = username, ConnectionId = connectionId };
+            var player = new ServerPlayer { Username = username, ConnectionId = connectionId, State = PlayerState.InLobby };
 
             game.Players.Add(player);
             await hubContext.Groups.AddToGroupAsync(connectionId, gameCode);
@@ -68,6 +68,9 @@ namespace CardsAgainstWhatever.Server.Services
             {
                 var newCards = game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count);
                 player.CardsInHand.AddRange(newCards);
+                player.PlayedCards.Clear();
+                player.State = PlayerState.PlayingMove;
+
                 return hubContext.Clients.Client(player.ConnectionId).NewRound(new NewRoundEvent
                 {
                     DealtCards = newCards,
@@ -76,6 +79,35 @@ namespace CardsAgainstWhatever.Server.Services
                     CardCzar = game.CurrentCardCzar,
                 });
             }));
+        }
+
+        public async Task PlayCards(string gameCode, string username, List<AnswerCard> playedCards)
+        {
+            var game = await gameRepositoy.GetByCode(gameCode);
+            var player = game.Players.Find(player => player.Username == username);
+            var gameGroupClient = hubContext.Clients.Group(gameCode);
+
+            if (player == null)
+            {
+                throw new Exception($"Player {username} not found in game {gameCode}.");
+            }
+
+            player.PlayedCards = playedCards;
+            player.State = PlayerState.MovePlayed;
+
+            await gameGroupClient.NewMovePlayed(new NewMovePlayedEvent { Username = username });
+
+            var allPlayersMadeMove = game.Players
+                .Where(player => player != game.CurrentCardCzar)
+                .All(player => player.PlayedCards.Any());
+
+            if (allPlayersMadeMove)
+            {
+                await gameGroupClient.AllMovesPlayed(new AllMovesPlayedEvent
+                {
+                    PlayedCardsGroupedPerPlayer = game.Players.Select(player => player.PlayedCards).ToList()
+                });
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace CardsAgainstWhatever.Server.Models
 
         public void SelectNextCardCzar()
         {
-            if (Players is null || Players.Count > 2)
+            if (Players is null || Players.Count < 2)
             {
                 throw new Exception("Not enough players!");
             }

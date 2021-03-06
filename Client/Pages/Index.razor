@@ -13,13 +13,9 @@ else if (GameState.State == Client.GameState.Joined)
 {
     <LobbyModal />
 }
-else if (GameState.State == Client.GameState.PickAnswerCards)
+else
 {
     <GameBoard />
-}
-else if (GameState.State == Client.GameState.AwaitAnswerCards)
-{
-    <p>You're the CardCzar!</p>
 }
 
 
