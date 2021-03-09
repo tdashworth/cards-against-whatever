@@ -1,0 +1,68 @@
+﻿@inject GameStateContainer GameStateContainer
+
+<section class="card" style="@CssStyle">
+    <!-- Cards In Hand -->
+    <div class="card-header">
+        <b>Your Hand</b>
+    </div>
+    <div class="card-body p-0">
+        <div class="game-card-list">
+            @foreach (var card in GameStateContainer.CardsInHand)
+            {
+                <article class="game-card answer-card" @onclick="() => OnCardSelected(card)">
+                    <div class="dummy"></div>
+                    <header class="game-card-header">
+                        <h3>@card.Text</h3>
+                    </header>
+                    @if (SelectedCards.Contains(card))
+                    {
+                        <div class="game-card-footer">
+                            <span>Picked</span>
+                        </div>
+                    }
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string CssStyle { get; set; }
+
+    List<AnswerCard> SelectedCards = new();
+    bool IsSinglePickQuestion { get => GameStateContainer.QuestionCard.Picks == 1; }
+    bool HasSelectedRequiredCards { get => SelectedCards.Count == GameStateContainer.QuestionCard.Picks; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameStateContainer.OnChange += StateHasChanged;
+    }
+
+    void OnCardSelected(AnswerCard card)
+    {
+        if (GameStateContainer.IsCardCzar) return;
+
+        if (IsSinglePickQuestion)
+        {
+            SelectedCards.Clear();
+            SelectedCards.Add(card);
+        }
+        else
+        {
+            if (SelectedCards.Contains(card))
+            {
+                SelectedCards.Remove(card);
+            }
+            else if (SelectedCards.Count < GameStateContainer.QuestionCard.Picks)
+            {
+                SelectedCards.Add(card);
+            }
+        }
+
+        GameStateContainer.ActionButton.IsEnabled = HasSelectedRequiredCards;
+        GameStateContainer.ActionButton.ButtonMessage = HasSelectedRequiredCards
+            ? string.Empty
+            : $"Select {GameStateContainer.QuestionCard.Picks} card(s)";
+    }
+}

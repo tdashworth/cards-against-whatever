@@ -1,0 +1,24 @@
+﻿@inject GameStateContainer GameStateContainer
+
+<section class="card" style="@CssStyle">
+    <div class="card-header">
+        <b>Players</b>
+    </div>
+    <ul class="list-group list-group-flush" style="overflow-y: auto;">
+        @foreach (var player in GameStateContainer.Players)
+        {
+            <li class="list-group-item">@player.Username<span class="float-right">@player.State.ToString()</span></li>
+        }
+        <li class="list-group-item"></li>
+    </ul>
+</section>
+
+@code {
+    [Parameter]
+    public string CssStyle { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameStateContainer.OnChange += StateHasChanged;
+    }
+}

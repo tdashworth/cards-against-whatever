@@ -3,166 +3,20 @@
 @inject GameStateContainer GameStateContainer
 
 <div id="game-board" class="p-4">
+    <DetailsPane CssStyle="grid-column: 1 / 2; grid-row: 1;" />
 
-    <section class="card" style="grid-column: 1 / 2; grid-row: 1;">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <b>Cards Against Whatever!</b>
-            <button type="button" class="btn btn-sm btn-danger">Leave</button>
-        </div>
-        <div class="card-body">
-            <p>Game Code: <b>@GameStateContainer.Code</b></p>
-            <p>Username: <b>@GameStateContainer.Username</b></p>
-            <p>
-                <hr>
-            </p>
-            <p>Round: <b>@GameStateContainer.RoundNumber</b></p>
-            <p>Card Czar: <b>@GameStateContainer.CardCzar?.Username</b></p>
-            <p>
-                <hr>
-            </p>
-        </div>
-        @if (GameStateContainer.ActionButton?.ButtonText != string.Empty)
-        {
-            <div class="card-footer bg-white">
-                <button type="button"
-                        class="btn btn-primary w-100"
-                        @onclick="() => OnButtonClick()"
-                        disabled="@(!GameStateContainer.ActionButton.IsEnabled)">
-                    @GameStateContainer.ActionButton.ButtonText
-                </button>
-                <p>@GameStateContainer.ActionButton.ButtonMessage</p>
-            </div>
-        }
-    </section>
+    <QuestionCardPane CssStyle="grid-column: 2 / 3; grid-row: 1;" />
 
-    <section class="card" style="grid-column: 2 / 3; grid-row: 1;">
-        <div class="card-body">
-            @if (GameStateContainer.QuestionCard != null)
-            {
-                <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
-                    <div class="dummy"></div>
-                    <header class="game-card-header">
-                        <h3>@GameStateContainer.QuestionCard.Text</h3>
-                    </header>
+    <PlayersListPane CssStyle="grid-column: 3 / 4; grid-row: 1;" />
 
-                    @if (GameStateContainer.QuestionCard.Picks > 1)
-                    {
-                        <div class="game-card-footer">
-                            <span>Pick @GameStateContainer.QuestionCard.Picks</span>
-                        </div>
-                    }
-                </article>
-            }
-        </div>
-    </section>
-
-    <section class="card" style="grid-column: 3 / 4; grid-row: 1;">
-        <div class="card-header">
-            <b>Players</b>
-        </div>
-        <ul class="list-group list-group-flush" style="overflow-y: auto;">
-            @foreach (var player in GameStateContainer.Players)
-            {
-                <li class="list-group-item">@player.Username<span class="float-right">@player.State.ToString()</span></li>
-            }
-            <li class="list-group-item"></li>
-        </ul>
-    </section>
-
-    <section class="card" style="grid-column: 1 / 4; grid-row: 2;">
-        <!-- Cards In Hand -->
-        <div class="card-header">
-            <b>Your Hand</b>
-        </div>
-        <div class="card-body p-0">
-            <div class="game-card-list">
-                @foreach (var card in GameStateContainer.CardsInHand)
-                {
-                    <article class="game-card answer-card" @onclick="() => OnCardSelected(card)">
-                        <div class="dummy"></div>
-                        <header class="game-card-header">
-                            <h3>@card.Text</h3>
-                        </header>
-                        @if (SelectedCards.Contains(card))
-                        {
-                            <div class="game-card-footer">
-                                <span>Picked</span>
-                            </div>
-                        }
-                    </article>
-                }
-            </div>
-        </div>
-    </section>
+    <CardsInHandPane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
 </div>
 
 @code {
-    List<AnswerCard> SelectedCards = new();
-    bool IsSinglePickQuestion { get => GameStateContainer.QuestionCard.Picks == 1; }
-    bool HasSelectedRequiredCards { get => SelectedCards.Count == GameStateContainer.QuestionCard.Picks; }
 
     protected override async Task OnInitializedAsync()
     {
         GameStateContainer.OnChange += StateHasChanged;
-    }
-
-    async void OnButtonClick()
-    {
-        if (GameStateContainer.State == GameState.PickAnswerCards)
-        {
-            GameStateContainer.PlayMove(SelectedCards);
-            await HubConnection.SendAsync(nameof(IGameServer.PlayPlayerMove), new PlayMovePlayerAction
-            {
-                GameCode = GameStateContainer.Code,
-                Username = GameStateContainer.Username,
-                PlayedCards = GameStateContainer.CardsSelected
-            });
-        }
-
-        if (GameStateContainer.State == GameState.PickWinner)
-        {
-            await HubConnection.SendAsync(nameof(IGameServer.PlayCardCzarMove), new PlayMoveCardCzarAction
-            {
-                GameCode = GameStateContainer.Code,
-                Username = GameStateContainer.Username,
-                WinningCards = GameStateContainer.CardsSelected
-            });
-        }
-
-        if (GameStateContainer.State == GameState.Joined)
-        {
-            await HubConnection.SendAsync(nameof(IGameServer.StartRound), new StartRoundAction
-            {
-                GameCode = GameStateContainer.Code
-            });
-        }
-    }
-
-    void OnCardSelected(AnswerCard card)
-    {
-        if (GameStateContainer.IsCardCzar) return;
-
-        if (IsSinglePickQuestion)
-        {
-            SelectedCards.Clear();
-            SelectedCards.Add(card);
-        }
-        else
-        {
-            if (SelectedCards.Contains(card))
-            {
-                SelectedCards.Remove(card);
-            }
-            else if (SelectedCards.Count < GameStateContainer.QuestionCard.Picks)
-            {
-                SelectedCards.Add(card);
-            }
-        }
-
-        GameStateContainer.ActionButton.IsEnabled = HasSelectedRequiredCards;
-        GameStateContainer.ActionButton.ButtonMessage = HasSelectedRequiredCards
-            ? string.Empty
-            : $"Select {GameStateContainer.QuestionCard.Picks} card(s)";
-    }
+    }    
 
 }

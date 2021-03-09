@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+@inject GameStateContainer GameStateContainer
+
+<section class="card" style="@CssStyle">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <b>Cards Against Whatever!</b>
+        <button type="button" class="btn btn-sm btn-danger">Leave</button>
+    </div>
+    <div class="card-body">
+        <p>Game Code: <b>@GameStateContainer.Code</b></p>
+        <p>Username: <b>@GameStateContainer.Username</b></p>
+        <p>
+            <hr>
+        </p>
+        <p>Round: <b>@GameStateContainer.RoundNumber</b></p>
+        <p>Card Czar: <b>@GameStateContainer.CardCzar?.Username</b></p>
+        <p>
+            <hr>
+        </p>
+    </div>
+    @if (GameStateContainer.ActionButton?.ButtonText != string.Empty)
+    {
+        <div class="card-footer bg-white">
+            <button type="button"
+                    class="btn btn-primary w-100"
+                    @onclick="() => OnButtonClick()"
+                    disabled="@(!GameStateContainer.ActionButton.IsEnabled)">
+                @GameStateContainer.ActionButton.ButtonText
+            </button>
+            <p>@GameStateContainer.ActionButton.ButtonMessage</p>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public string CssStyle { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameStateContainer.OnChange += StateHasChanged;
+    }
+
+    async void OnButtonClick()
+    {
+        if (GameStateContainer.State == GameState.PickAnswerCards)
+        {
+            // GameStateContainer.PlayMove(SelectedCards);
+            await HubConnection.SendAsync(nameof(IGameServer.PlayPlayerMove), new PlayMovePlayerAction
+            {
+                GameCode = GameStateContainer.Code,
+                Username = GameStateContainer.Username,
+                PlayedCards = GameStateContainer.CardsSelected
+            });
+        }
+
+        if (GameStateContainer.State == GameState.PickWinner)
+        {
+            await HubConnection.SendAsync(nameof(IGameServer.PlayCardCzarMove), new PlayMoveCardCzarAction
+            {
+                GameCode = GameStateContainer.Code,
+                Username = GameStateContainer.Username,
+                WinningCards = GameStateContainer.CardsSelected
+            });
+        }
+
+        if (GameStateContainer.State == GameState.Joined)
+        {
+            await HubConnection.SendAsync(nameof(IGameServer.StartRound), new StartRoundAction
+            {
+                GameCode = GameStateContainer.Code
+            });
+        }
+    }
+}
