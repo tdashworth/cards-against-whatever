@@ -1,6 +1,6 @@
 ﻿@inject BlazorComponentBus.ComponentBus Bus
 
-<section class="card" style="@CssStyle">
+<section class="card" style="@(IsDiplayed ? string.Empty : "display: none;") @CssStyle">
     <div class="card-header">
         <b>Your Hand</b>
     </div>
@@ -8,7 +8,7 @@
         <div class="game-card-list">
             @foreach (var card in CardsInHand)
             {
-                <article class="game-card answer-card" @onclick="() => OnCardSelected(card)">
+                <article class="game-card selectable-game-card answer-card" @onclick="() => OnCardSelected(card)">
                     <div class="dummy"></div>
                     <header class="game-card-header">
                         <h3>@card.Text</h3>
@@ -32,19 +32,40 @@
     QuestionCard QuestionCard;
     List<AnswerCard> CardsInHand = new();
     List<AnswerCard> SelectedCards = new();
-
+    private string Username;
+    private bool IsCardCzar;
+    private bool IsDiplayed = true;
     bool IsSinglePickQuestion { get => QuestionCard.Picks == 1; }
     bool HasSelectedRequiredCards { get => SelectedCards.Count == QuestionCard.Picks; }
 
     protected override async Task OnInitializedAsync()
     {
-        Bus.Subscribe<RoundStartedEvent>((args) => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
+        Bus.Subscribe<GameJoinedEvent>(args => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
+        Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
+        Bus.Subscribe<PlayerMovedEvent>(args => OnPlayerMoved(args.GetMessage<PlayerMovedEvent>()));
+    }
+
+    private void OnGameJoined(GameJoinedEvent gameJoinedEvent)
+    {
+        Username = gameJoinedEvent.Username;
     }
 
     void OnRoundStarted(RoundStartedEvent roundStartedEvent)
     {
         QuestionCard = roundStartedEvent.QuestionCard;
         CardsInHand.AddRange(roundStartedEvent.DealtCards);
+        IsCardCzar = roundStartedEvent.CardCzar.Username == Username;
+        IsDiplayed = !IsCardCzar;
+
+        StateHasChanged();
+    }
+
+    void OnPlayerMoved(PlayerMovedEvent playerMovedEvent)
+    {
+        if (playerMovedEvent.Username == Username && IsDiplayed)
+        {
+            IsDiplayed = false;
+        }
         StateHasChanged();
     }
 

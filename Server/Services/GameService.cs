@@ -106,7 +106,9 @@ namespace CardsAgainstWhatever.Server.Services
             {
                 await gameGroupClient.RoundClosed(new RoundClosedEvent
                 {
-                    PlayedCardsGroupedPerPlayer = game.Players.Select(player => player.PlayedCards).ToList()
+                    PlayedCardsGroupedPerPlayer = game.Players
+                        .Where(player => player != game.CurrentCardCzar)
+                        .Select(player => player.PlayedCards).ToList()
                 });
             }
         }

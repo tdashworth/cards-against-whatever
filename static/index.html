@@ -90,101 +90,92 @@
       </div>
       <div class="card-body p-0">
         <div class="game-card-list">
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+          <div class="selectable-game-card d-flex mr-4">
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+          </div>
+          <div class="selectable-game-card d-flex mr-4">
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+          </div>
+          <div class="selectable-game-card d-flex mr-4">
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-          </article>
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
 
-                I'm having some trouble with _ and would like for advice.</h3>
-            </header>
-            <div class="game-card-footer">
-              <span>1st pick</span>
-            </div>
-          </article>
+          </div>
+          <div class="selectable-game-card d-flex mr-4">
 
-          <article class="game-card answer-card">
-            <div class="dummy"></div>
-            <header class="game-card-header">
-              <h3>Dear Abby,
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
 
-                I'm having some trouble with _______ and would like for advice.</h3>
-            </header>
-            <div class="game-card-footer">
-              <span>Picked</span>
-            </div>
-          </article>
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
+
+            <article class="game-card answer-card">
+              <div class="dummy"></div>
+              <header class="game-card-header">
+                <h3>Dear Abby,
+
+                  I'm having some trouble with _ and would like for advice.</h3>
+              </header>
+            </article>
+
+          </div>
         </div>
       </div>
     </section>
@@ -214,7 +205,6 @@
     .game-card-list .game-card {
       width: 12%;
       box-shadow: -1rem 0 1.5rem -0.5rem #555;
-      transition: .2s;
     }
 
     .game-card {
@@ -226,20 +216,25 @@
       overflow: hidden;
     }
 
+    .game-card-list .selectable-game-card,
+    .game-card-list .game-card {
+      transition: 0.2s;
+    }
+
     .game-card .dummy {
       padding-top: 150%;
     }
 
-    .game-card-list .game-card:hover {
+    .game-card-list .selectable-game-card:hover {
       transform: translateY(-1.5rem);
     }
 
-    .game-card-list .game-card:hover~.game-card {
-      transform: translateX(70px);
+    .game-card-list .game-card:hover+.game-card {
+      margin-left: 1em;
     }
 
     .game-card-list .game-card:not(:first-child) {
-      margin-left: -50px;
+      margin-left: -4em;
     }
 
     .game-card-header {
