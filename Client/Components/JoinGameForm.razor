@@ -2,7 +2,7 @@
 @using CardsAgainstWhatever.Shared.Dtos.Events
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HubConnection HubConnection
-@inject GameStateContainer GameState
+@inject BlazorComponentBus.ComponentBus Bus
 
 <EditForm Model="@JoinModel" OnValidSubmit="@HandleValidSubmit">
     <h3>Join Game</h3>
@@ -49,7 +49,7 @@
                 Username = JoinModel.Username
             });
 
-            GameState.JoinGame(JoinModel.GameCode, JoinModel.Username, joinResponse.ExistingPlayersInGame);
+            await Bus.Publish(joinResponse);
         }
         catch (Exception)
         {

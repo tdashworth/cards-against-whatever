@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{36810F4E-B9F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0A1902BA-F917-45E3-ABF9-2A0872B5B7AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstWhatever.Server.Tests.Unit", "CardsAgainstWhatever.Server.Tests.Unit\CardsAgainstWhatever.Server.Tests.Unit.csproj", "{D93E39A3-3491-4C42-9C91-D531508A821F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardsAgainstWhatever.Server.Tests.Unit", "CardsAgainstWhatever.Server.Tests.Unit\CardsAgainstWhatever.Server.Tests.Unit.csproj", "{D93E39A3-3491-4C42-9C91-D531508A821F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

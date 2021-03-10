@@ -1,28 +1,27 @@
 ﻿@page "/"
-@using Microsoft.AspNetCore.SignalR.Client
-@inject HubConnection HubConnection
-@inject GameStateContainer GameState
+@inject BlazorComponentBus.ComponentBus Bus
 
 <SignalRListeners />
+<GameBoard />
 
-@if (GameState.State == Client.GameState.New)
+@if (NewGame)
 {
     <StartupModal />
-}
-@*else if (GameState.State == Client.GameState.Joined)
-{
-    <LobbyModal />
-}*@
-else
-{
-    <GameBoard />
 }
 
 
 @code {
+    bool NewGame = true;
 
     protected override async Task OnInitializedAsync()
     {
-        GameState.OnChange += StateHasChanged;
+
+        Bus.Subscribe<GameJoinedEvent>((args) => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
+    }
+
+    private void OnGameJoined(GameJoinedEvent gameJoinedEvent)
+    {
+        NewGame = false;
+        StateHasChanged();
     }
 }

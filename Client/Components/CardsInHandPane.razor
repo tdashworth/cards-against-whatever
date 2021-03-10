@@ -1,13 +1,12 @@
-﻿@inject GameStateContainer GameStateContainer
+﻿@inject BlazorComponentBus.ComponentBus Bus
 
 <section class="card" style="@CssStyle">
-    <!-- Cards In Hand -->
     <div class="card-header">
         <b>Your Hand</b>
     </div>
     <div class="card-body p-0">
         <div class="game-card-list">
-            @foreach (var card in GameStateContainer.CardsInHand)
+            @foreach (var card in CardsInHand)
             {
                 <article class="game-card answer-card" @onclick="() => OnCardSelected(card)">
                     <div class="dummy"></div>
@@ -30,19 +29,27 @@
     [Parameter]
     public string CssStyle { get; set; }
 
+    QuestionCard QuestionCard;
+    List<AnswerCard> CardsInHand = new();
     List<AnswerCard> SelectedCards = new();
-    bool IsSinglePickQuestion { get => GameStateContainer.QuestionCard.Picks == 1; }
-    bool HasSelectedRequiredCards { get => SelectedCards.Count == GameStateContainer.QuestionCard.Picks; }
+
+    bool IsSinglePickQuestion { get => QuestionCard.Picks == 1; }
+    bool HasSelectedRequiredCards { get => SelectedCards.Count == QuestionCard.Picks; }
 
     protected override async Task OnInitializedAsync()
     {
-        GameStateContainer.OnChange += StateHasChanged;
+        Bus.Subscribe<RoundStartedEvent>((args) => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
+    }
+
+    void OnRoundStarted(RoundStartedEvent roundStartedEvent)
+    {
+        QuestionCard = roundStartedEvent.QuestionCard;
+        CardsInHand.AddRange(roundStartedEvent.DealtCards);
+        StateHasChanged();
     }
 
     void OnCardSelected(AnswerCard card)
     {
-        if (GameStateContainer.IsCardCzar) return;
-
         if (IsSinglePickQuestion)
         {
             SelectedCards.Clear();
@@ -54,15 +61,13 @@
             {
                 SelectedCards.Remove(card);
             }
-            else if (SelectedCards.Count < GameStateContainer.QuestionCard.Picks)
+            else if (SelectedCards.Count < QuestionCard.Picks)
             {
                 SelectedCards.Add(card);
             }
         }
 
-        GameStateContainer.ActionButton.IsEnabled = HasSelectedRequiredCards;
-        GameStateContainer.ActionButton.ButtonMessage = HasSelectedRequiredCards
-            ? string.Empty
-            : $"Select {GameStateContainer.QuestionCard.Picks} card(s)";
+        Bus.Publish(new CardSelectedEvent { SelectedCards = SelectedCards });
+        StateHasChanged();
     }
 }

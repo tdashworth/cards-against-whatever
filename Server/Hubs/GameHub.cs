@@ -33,6 +33,8 @@ namespace CardsAgainstWhatever.Server.Hubs
             await gameService.Join(request.GameCode, request.Username, Context.ConnectionId);
 
             return new GameJoinedEvent { 
+                Code = request.GameCode,
+                Username = request.Username,
                 ExistingPlayersInGame = await gameService.GetPlayers(request.GameCode) 
             };
         }

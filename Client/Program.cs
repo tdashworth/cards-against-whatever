@@ -1,3 +1,4 @@
+using BlazorComponentBus;
 using CardsAgainstWhatever.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -26,6 +27,7 @@ namespace CardsAgainstWhatever.Client
                 .WithAutomaticReconnect()
                 .Build());
             builder.Services.AddSingleton(sp => new GameStateContainer());
+            builder.Services.AddScoped<ComponentBus>();
 
             await builder.Build().RunAsync();
         }
