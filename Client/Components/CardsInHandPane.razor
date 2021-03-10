@@ -56,6 +56,7 @@
         CardsInHand.AddRange(roundStartedEvent.DealtCards);
         IsCardCzar = roundStartedEvent.CardCzar.Username == Username;
         IsDiplayed = !IsCardCzar;
+        SelectedCards = new();
 
         StateHasChanged();
     }

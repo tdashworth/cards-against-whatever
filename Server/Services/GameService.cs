@@ -117,7 +117,9 @@ namespace CardsAgainstWhatever.Server.Services
         {
             var game = await gameRepositoy.GetByCode(gameCode);
             var gameGroupClient = hubContextFascade.GetGroup(gameCode);
-            var winner = game.Players.Find(player => player.CardsInHand.All(card => winningCards.Contains(card)));
+            var winner = game.Players
+                .Where(player => player != game.CurrentCardCzar)
+                .FirstOrDefault(player => player.PlayedCards.All(card => winningCards.Contains(card)));
 
             if (winner == null)
             {

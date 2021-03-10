@@ -8,7 +8,7 @@
         <div class="game-card-list">
             @foreach (var playersSelection in CardsOnTable)
             {
-                <div class="selectable-game-card d-flex mr-4" @onclick="() => OnCardSelected(playersSelection)">
+                <div class="selectable-game-card d-flex mr-4" @onclick="() => OnWinningCardSetSelected(playersSelection)">
                     @foreach (var card in playersSelection)
                     {
                         <article class="game-card answer-card">
@@ -16,6 +16,12 @@
                             <header class="game-card-header">
                                 <h3>@card.Text</h3>
                             </header>
+                            @if (playersSelection == SelectedCards)
+                            {
+                                <div class="game-card-footer">
+                                    <span>Picked</span>
+                                </div>
+                            }
                         </article>
                     }
                 </div>
@@ -56,6 +62,7 @@
         CardsOnTable = new();
         IsCardCzar = roundStartedEvent.CardCzar.Username == Username;
         IsDiplayed = IsCardCzar;
+        SelectedCards = new();
         StateHasChanged();
     }
 
@@ -76,11 +83,13 @@
         StateHasChanged();
     }
 
-    void OnCardSelected(List<AnswerCard> cards)
+    void OnWinningCardSetSelected(List<AnswerCard> cards)
     {
+        if (!IsCardCzar) return;
+
         SelectedCards = cards;
 
-        Bus.Publish(new CardSelectedEvent { SelectedCards = SelectedCards });
+        Bus.Publish(new WinningCardSelectedEvent { SelectedWinningCards = SelectedCards });
         StateHasChanged();
     }
 }
