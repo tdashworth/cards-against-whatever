@@ -32,7 +32,7 @@
     private Player CardCzar;
 
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Bus.Subscribe<GameJoinedEvent>(args => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
         Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));

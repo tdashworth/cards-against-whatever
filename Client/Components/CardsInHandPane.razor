@@ -38,7 +38,7 @@
     bool IsSinglePickQuestion { get => QuestionCard.Picks == 1; }
     bool HasSelectedRequiredCards { get => SelectedCards.Count == QuestionCard.Picks; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Bus.Subscribe<GameJoinedEvent>(args => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
         Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));

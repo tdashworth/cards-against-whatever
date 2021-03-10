@@ -28,7 +28,7 @@
     private bool IsCardCzar;
     private QuestionCard QuestionCard;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Bus.Subscribe<GameJoinedEvent>((args) => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
         Bus.Subscribe<RoundStartedEvent>((args) => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));

@@ -1,7 +1,4 @@
-﻿@using Microsoft.AspNetCore.SignalR.Client
-@inject HubConnection HubConnection
-@inject GameStateContainer GameStateContainer
-
+﻿
 <div id="game-board" class="p-4">
     <DetailsPane CssStyle="grid-column: 1 / 2; grid-row: 1;" />
 
@@ -14,10 +11,5 @@
 </div>
 
 @code {
-
-    protected override async Task OnInitializedAsync()
-    {
-        GameStateContainer.OnChange += StateHasChanged;
-    }    
 
 }

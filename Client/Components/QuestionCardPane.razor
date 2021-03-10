@@ -27,7 +27,7 @@
 
     private QuestionCard QuestionCard;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
     }

@@ -20,7 +20,7 @@
     private List<Player> Players = new();
     private Player CardCzar;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Bus.Subscribe<GameJoinedEvent>((args) => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
         Bus.Subscribe<PlayerJoinedEvent>((args) => OnNewPlayer(args.GetMessage<PlayerJoinedEvent>()));
