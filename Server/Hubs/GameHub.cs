@@ -1,10 +1,12 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Commands;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
 using CardsAgainstWhatever.Shared.Dtos;
 using CardsAgainstWhatever.Shared.Dtos.Actions;
 using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
+using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -16,11 +18,13 @@ namespace CardsAgainstWhatever.Server.Hubs
 {
     public class GameHub : Hub<IGameClient>, IGameServer
     {
+        private readonly IMediator mediator;
         private readonly IGameService gameService;
 
-        public GameHub(IGameService gameService)
+        public GameHub(IGameService gameService, IMediator mediator)
         {
             this.gameService = gameService;
+            this.mediator = mediator;
         }
 
         public async Task<GameCreatedEvent> CreateGame(CreateGameAction request)
@@ -28,16 +32,12 @@ namespace CardsAgainstWhatever.Server.Hubs
                 GameCode = await gameService.Create(request.QuestionCards, request.AnswerCards) 
             };
 
-        public async Task<GameJoinedEvent> JoinGame(JoinGameAction request)
+        public Task<GameJoinedEvent> JoinGame(JoinGameAction request) => mediator.Send(new JoinGameCommand
         {
-            await gameService.Join(request.GameCode, request.Username, Context.ConnectionId);
-
-            return new GameJoinedEvent { 
-                Code = request.GameCode,
-                Username = request.Username,
-                ExistingPlayersInGame = await gameService.GetPlayers(request.GameCode) 
-            };
-        }
+            GameCode = request.GameCode,
+            Username = request.Username,
+            ConnectionId = Context.ConnectionId
+        });
 
         public Task StartRound(StartRoundAction startRoundEvent) => gameService.StartRound(startRoundEvent.GameCode);
 
