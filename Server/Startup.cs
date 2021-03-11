@@ -2,6 +2,7 @@ using CardsAgainstWhatever.Server.Hubs;
 using CardsAgainstWhatever.Server.Services;
 using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System.Reflection;
 
 namespace CardsAgainstWhatever.Server
 {
@@ -29,6 +31,8 @@ namespace CardsAgainstWhatever.Server
             services.AddSignalR();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddScoped<IGameRepositoy, GameRepository>();
             services.AddScoped<IGameService, GameService>();
