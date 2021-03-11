@@ -39,7 +39,10 @@ namespace CardsAgainstWhatever.Server.Hubs
             ConnectionId = Context.ConnectionId
         });
 
-        public Task StartRound(StartRoundAction startRoundEvent) => gameService.StartRound(startRoundEvent.GameCode);
+        public Task StartRound(StartRoundAction startRoundAction) => mediator.Send(new StartRoundCommand
+        {
+            GameCode = startRoundAction.GameCode
+        });
 
         public Task PlayPlayerMove(PlayMovePlayerAction playCardsEvent) => gameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
 
