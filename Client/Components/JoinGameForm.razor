@@ -1,0 +1,59 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using CardsAgainstWhatever.Shared.Dtos.Events
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HubConnection HubConnection
+@inject BlazorComponentBus.ComponentBus Bus
+
+<EditForm Model="@JoinModel" OnValidSubmit="@HandleValidSubmit">
+    <h3>Join Game</h3>
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="game-code-text" class="col-form-label">Game Code</label>
+        <InputText @bind-Value="JoinModel.GameCode" class="form-control" id="game-code-text" />
+    </div>
+    <div class="form-group">
+        <label for="join-username-text" class="col-form-label">Username</label>
+        <InputText @bind-Value="JoinModel.Username" class="form-control" id="join-username-text" />
+    </div>
+    <button type="submit" class="btn btn-primary">Join</button>
+</EditForm>
+
+
+@code {
+
+    private class JoinForm
+    {
+        [Required]
+        [StringLength(10, ErrorMessage = "Name is too long.")]
+        public string Username { get; set; }
+
+        [Required]
+        [StringLength(5, ErrorMessage = "Code is too long.")]
+        public string GameCode { get; set; }
+    }
+
+    JoinForm JoinModel = new JoinForm();
+
+    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var joinResponse = await HubConnection.InvokeAsync<GameJoinedEvent>(nameof(IGameServer.JoinGame), new JoinGameAction
+            {
+                GameCode = JoinModel.GameCode,
+                Username = JoinModel.Username
+            });
+
+            await Bus.Publish(joinResponse);
+        }
+        catch (Exception)
+        {
+            //TODO
+        }
+    }
+}

@@ -1,7 +1,27 @@
 ﻿@page "/"
+@inject BlazorComponentBus.ComponentBus Bus
 
-<h1>Hello, world!</h1>
+<SignalRListeners />
+<GameBoard />
 
-Welcome to your new app.
+@if (NewGame)
+{
+    <StartupModal />
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    bool NewGame = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        Bus.Subscribe<GameJoinedEvent>((args) => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
+    }
+
+    private void OnGameJoined(GameJoinedEvent gameJoinedEvent)
+    {
+        NewGame = false;
+        StateHasChanged();
+    }
+}

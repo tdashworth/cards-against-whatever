@@ -1,0 +1,57 @@
+﻿
+# Messages
+
+## CreateGame ✔
+Give:
+- Cards
+Get:
+- Code
+- Pin?
+
+## JoinGame  ✔
+Give:
+- Code
+- Pin
+- Username
+Get:
+- Players
+	- Username
+Publish:
+- NewPlayer
+	- Username
+
+## StartRound
+Give:
+Get:
+Publish:
+- NewRound
+	- Drawn Cards (Play specific)
+	- Card Czar
+	- Question Card
+
+## PlayCards
+Give:
+- Cards
+	- Text
+Get:
+Publish:
+- CardPlayed
+	- Username
+? RoundClosed
+	- Played Cards
+		- Cards
+			- Text
+
+## PickWinner
+Give:
+- Card
+	-Text
+Get:
+Publish:
+- RoundWinner
+	- Cards
+		- Text
+	- Player
+		- Username
+
+... NewRound

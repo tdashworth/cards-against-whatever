@@ -1,0 +1,40 @@
+﻿@inject BlazorComponentBus.ComponentBus Bus
+
+<section class="card" style="@CssStyle">
+    <div class="card-body">
+        @if (QuestionCard != null)
+        {
+            <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
+                <div class="dummy"></div>
+                <header class="game-card-header">
+                    <h3>@QuestionCard.Text</h3>
+                </header>
+
+                @if (QuestionCard.Picks > 1)
+                {
+                    <div class="game-card-footer">
+                        <span>Pick @QuestionCard.Picks</span>
+                    </div>
+                }
+            </article>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string CssStyle { get; set; }
+
+    private QuestionCard QuestionCard;
+
+    protected override void OnInitialized()
+    {
+        Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
+    }
+
+    void OnRoundStarted(RoundStartedEvent roundStartedEvent)
+    {
+        QuestionCard = roundStartedEvent.QuestionCard;
+        StateHasChanged();
+    }
+}
