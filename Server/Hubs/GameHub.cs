@@ -44,7 +44,12 @@ namespace CardsAgainstWhatever.Server.Hubs
             GameCode = startRoundAction.GameCode
         });
 
-        public Task PlayPlayerMove(PlayMovePlayerAction playCardsEvent) => gameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
+        public Task PlayPlayerMove(PlayAnswerAction playCardsEvent) => mediator.Send(new PlayAnswerCommand
+        {
+            GameCode = playCardsEvent.GameCode,
+            Username = playCardsEvent.Username,
+            SelectedAnswerCards = playCardsEvent.PlayedCards
+        });
 
         public Task PlayCardCzarMove(PlayMoveCardCzarAction pickWinningCardsEvent) => gameService.PickWinner(pickWinningCardsEvent.GameCode, pickWinningCardsEvent.WinningCards);
 

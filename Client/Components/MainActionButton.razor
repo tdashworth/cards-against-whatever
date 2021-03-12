@@ -78,7 +78,7 @@
             IsEnabled = false;
             OnClick = async () =>
             {
-                await HubConnection.SendAsync(nameof(IGameServer.PlayPlayerMove), new PlayMovePlayerAction
+                await HubConnection.SendAsync(nameof(IGameServer.PlayPlayerMove), new PlayAnswerAction
                 {
                     GameCode = Code,
                     Username = Username,
