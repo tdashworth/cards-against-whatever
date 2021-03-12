@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Shared.Dtos.Actions
 {
-    public class PlayMoveCardCzarAction
+    public class PlayAnswerAction
     {
-        public string GameCode { get; set; }
+        public string GameCode { get;  set; }
         public string Username { get; set; }
-        public List<AnswerCard> WinningCards { get; set; }
+        public List<AnswerCard> PlayedCards { get; set; }
     }
 }

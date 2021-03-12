@@ -1,10 +1,12 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Commands;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared;
 using CardsAgainstWhatever.Shared.Dtos;
 using CardsAgainstWhatever.Shared.Dtos.Actions;
 using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
+using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -16,34 +18,43 @@ namespace CardsAgainstWhatever.Server.Hubs
 {
     public class GameHub : Hub<IGameClient>, IGameServer
     {
-        private readonly IGameService gameService;
+        private readonly IMediator mediator;
 
-        public GameHub(IGameService gameService)
+        public GameHub(IMediator mediator)
         {
-            this.gameService = gameService;
+            this.mediator = mediator;
         }
 
-        public async Task<GameCreatedEvent> CreateGame(CreateGameAction request)
-            => new GameCreatedEvent { 
-                GameCode = await gameService.Create(request.QuestionCards, request.AnswerCards) 
-            };
-
-        public async Task<GameJoinedEvent> JoinGame(JoinGameAction request)
+        public Task<GameCreatedEvent> CreateGame(CreateGameAction request) => mediator.Send(new CreateGameCommand
         {
-            await gameService.Join(request.GameCode, request.Username, Context.ConnectionId);
+            QuestionCards = request.QuestionCards,
+            AnswerCards = request.AnswerCards
+        });
 
-            return new GameJoinedEvent { 
-                Code = request.GameCode,
-                Username = request.Username,
-                ExistingPlayersInGame = await gameService.GetPlayers(request.GameCode) 
-            };
-        }
+        public Task<GameJoinedEvent> JoinGame(JoinGameAction request) => mediator.Send(new JoinGameCommand
+        {
+            GameCode = request.GameCode,
+            Username = request.Username,
+            ConnectionId = Context.ConnectionId
+        });
 
-        public Task StartRound(StartRoundAction startRoundEvent) => gameService.StartRound(startRoundEvent.GameCode);
+        public Task StartRound(StartRoundAction request) => mediator.Send(new StartRoundCommand
+        {
+            GameCode = request.GameCode
+        });
 
-        public Task PlayPlayerMove(PlayMovePlayerAction playCardsEvent) => gameService.PlayCards(playCardsEvent.GameCode, playCardsEvent.Username, playCardsEvent.PlayedCards);
+        public Task PlayPlayerMove(PlayAnswerAction request) => mediator.Send(new PlayAnswerCommand
+        {
+            GameCode = request.GameCode,
+            Username = request.Username,
+            SelectedAnswerCards = request.PlayedCards
+        });
 
-        public Task PlayCardCzarMove(PlayMoveCardCzarAction pickWinningCardsEvent) => gameService.PickWinner(pickWinningCardsEvent.GameCode, pickWinningCardsEvent.WinningCards);
+        public Task PlayCardCzarMove(PickWinnerAnswerAction request) => mediator.Send(new PickWinningAnswerCommand
+        {
+            GameCode = request.GameCode,
+            SelectedWinningAnswerCards = request.WinningCards
+        });
 
     }
 }
