@@ -19,18 +19,17 @@ namespace CardsAgainstWhatever.Server.Hubs
     public class GameHub : Hub<IGameClient>, IGameServer
     {
         private readonly IMediator mediator;
-        private readonly IGameService gameService;
 
-        public GameHub(IGameService gameService, IMediator mediator)
+        public GameHub(IMediator mediator)
         {
-            this.gameService = gameService;
             this.mediator = mediator;
         }
 
-        public async Task<GameCreatedEvent> CreateGame(CreateGameAction request)
-            => new GameCreatedEvent { 
-                GameCode = await gameService.Create(request.QuestionCards, request.AnswerCards) 
-            };
+        public Task<GameCreatedEvent> CreateGame(CreateGameAction request) => mediator.Send(new CreateGameCommand
+        {
+            QuestionCards = request.QuestionCards,
+            AnswerCards = request.AnswerCards
+        });
 
         public Task<GameJoinedEvent> JoinGame(JoinGameAction request) => mediator.Send(new JoinGameCommand
         {

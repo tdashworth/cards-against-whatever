@@ -45,4 +45,5 @@ namespace CardsAgainstWhatever.Server.Commands
 
             return Unit.Value;
         }
+    }
 }

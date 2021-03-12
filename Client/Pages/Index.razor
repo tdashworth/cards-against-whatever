@@ -13,7 +13,7 @@
 @code {
     bool NewGame = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 
         Bus.Subscribe<GameJoinedEvent>((args) => OnGameJoined(args.GetMessage<GameJoinedEvent>()));

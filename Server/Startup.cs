@@ -35,7 +35,6 @@ namespace CardsAgainstWhatever.Server
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddScoped<IGameRepositoy, GameRepository>();
-            services.AddScoped<IGameService, GameService>();
             services.AddScoped<IHubContextFascade<IGameClient>, HubContextFascade<GameHub, IGameClient>>();
         }
 
