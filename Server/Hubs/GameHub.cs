@@ -39,19 +39,23 @@ namespace CardsAgainstWhatever.Server.Hubs
             ConnectionId = Context.ConnectionId
         });
 
-        public Task StartRound(StartRoundAction startRoundAction) => mediator.Send(new StartRoundCommand
+        public Task StartRound(StartRoundAction request) => mediator.Send(new StartRoundCommand
         {
-            GameCode = startRoundAction.GameCode
+            GameCode = request.GameCode
         });
 
-        public Task PlayPlayerMove(PlayAnswerAction playCardsEvent) => mediator.Send(new PlayAnswerCommand
+        public Task PlayPlayerMove(PlayAnswerAction request) => mediator.Send(new PlayAnswerCommand
         {
-            GameCode = playCardsEvent.GameCode,
-            Username = playCardsEvent.Username,
-            SelectedAnswerCards = playCardsEvent.PlayedCards
+            GameCode = request.GameCode,
+            Username = request.Username,
+            SelectedAnswerCards = request.PlayedCards
         });
 
-        public Task PlayCardCzarMove(PlayMoveCardCzarAction pickWinningCardsEvent) => gameService.PickWinner(pickWinningCardsEvent.GameCode, pickWinningCardsEvent.WinningCards);
+        public Task PlayCardCzarMove(PickWinnerAnswerAction request) => mediator.Send(new PickWinningAnswerCommand
+        {
+            GameCode = request.GameCode,
+            SelectedWinningAnswerCards = request.WinningCards
+        });
 
     }
 }

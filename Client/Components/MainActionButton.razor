@@ -104,10 +104,9 @@
             IsEnabled = false;
             OnClick = async () =>
             {
-                await HubConnection.SendAsync(nameof(IGameServer.PlayCardCzarMove), new PlayMoveCardCzarAction
+                await HubConnection.SendAsync(nameof(IGameServer.PlayCardCzarMove), new PickWinnerAnswerAction
                 {
                     GameCode = Code,
-                    Username = Username,
                     WinningCards = SelectedCards,
                 });
                 Reset();
