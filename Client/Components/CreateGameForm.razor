@@ -4,7 +4,7 @@
 @using CsvHelper.Configuration
 @using System.ComponentModel.DataAnnotations;
 @using CardsAgainstWhatever.Shared.Dtos.Events
-@inject IGameServer GameServer
+@inject IGameServerProxy GameServer
 @inject BlazorComponentBus.ComponentBus Bus
 
 
@@ -83,13 +83,13 @@
                 AnswerCards = CreateModel.Answers
             });
 
-            var joinResponse = await GameServer.JoinGame(new JoinGameAction
+            await GameServer.JoinGame(new JoinGameAction
             {
                 GameCode = createResponse.GameCode,
                 Username = CreateModel.Username
             });
 
-            await Bus.Publish(joinResponse);
+            // Loading?
         }
         catch (Exception)
         {

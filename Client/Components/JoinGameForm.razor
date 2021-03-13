@@ -1,7 +1,6 @@
 ﻿@using System.ComponentModel.DataAnnotations;
-@using CardsAgainstWhatever.Shared.Dtos.Events
-@inject IGameServer GameServer
-@inject BlazorComponentBus.ComponentBus Bus
+@inject IGameServerProxy GameServer;
+@inject BlazorComponentBus.ComponentBus Bus;
 
 <EditForm Model="@JoinModel" OnValidSubmit="@HandleValidSubmit">
     <h3>Join Game</h3>
@@ -40,13 +39,13 @@
     {
         try
         {
-            var joinResponse = await GameServer.JoinGame(new JoinGameAction
+            await GameServer.JoinGame(new JoinGameAction
             {
                 GameCode = JoinModel.GameCode,
                 Username = JoinModel.Username
             });
 
-            await Bus.Publish(joinResponse);
+            // Loading?
         }
         catch (Exception)
         {

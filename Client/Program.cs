@@ -23,14 +23,11 @@ namespace CardsAgainstWhatever.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddSingleton(sp => new HubConnectionBuilder()
-                .WithUrl(sp.GetService<NavigationManager>().ToAbsoluteUri("/gamehub"))
-                .WithAutomaticReconnect()
-                .Build());
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             builder.Services.AddScoped<ComponentBus>();
 
-            builder.Services.AddScoped<IGameServer, GameServerProxy>();
+            builder.Services.AddScoped<IGameServerProxy, GameServerProxy>();
             builder.Services.AddScoped<IGameClient, GameClientListener>();
 
             await builder.Build().RunAsync();

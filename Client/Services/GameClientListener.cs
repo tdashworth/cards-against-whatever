@@ -17,6 +17,8 @@ namespace CardsAgainstWhatever.Client.Services
             Bus = bus;
         }
 
+        public Task GameJoined(GameJoinedEvent gameJoinedEvent) => Bus.Publish(gameJoinedEvent);
+
         public Task PlayerJoined(PlayerJoinedEvent playerJoinedEvent) => Bus.Publish(playerJoinedEvent);
 
         public Task RoundStarted(RoundStartedEvent roundStartedEvent) => Bus.Publish(roundStartedEvent);

@@ -12,22 +12,23 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
-    public class JoinGameCommand : IRequest<GameJoinedEvent>
+    public class JoinGameCommand : IRequest
     {
         public string GameCode { get; set; }
         public string Username { get; set; }
         public string ConnectionId { get; set; }
     }
 
-    class JoinGameHandler : BaseGameRequestHandler<JoinGameCommand, GameJoinedEvent>
+    class JoinGameHandler : BaseGameRequestHandler<JoinGameCommand>
     {
         public  JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
             : base(gameRepositoy, hubContextFascade) { }
 
-        public async override Task<GameJoinedEvent> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+        public async override Task<Unit> Handle(JoinGameCommand request, CancellationToken cancellationToken)
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
             var allPlayersClient = hubContextFascade.GetGroup(request.GameCode);
+            var callingPlayerClient = hubContextFascade.GetClient(request.ConnectionId);
 
             var player = new ServerPlayer
             {
@@ -44,12 +45,14 @@ namespace CardsAgainstWhatever.Server.Commands
                 NewPlayer = player
             });
 
-            return new GameJoinedEvent
+            await callingPlayerClient.GameJoined(new GameJoinedEvent
             {
                 Code = request.GameCode,
                 Username = request.Username,
                 ExistingPlayersInGame = game.Players.Cast<Player>().ToList()
-            };
+            });
+
+            return Unit.Value;
         }
     }
 }
