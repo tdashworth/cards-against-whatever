@@ -16,7 +16,6 @@ namespace CardsAgainstWhatever.Server.Services
         public HubContextFascade(IHubContext<THub, T> hubContext)
         {
             this.hubContext = hubContext;
-            this.hubContext = hubContext;
         }
 
         public T GetClient(string connectionId) => hubContext.Clients.Client(connectionId);
