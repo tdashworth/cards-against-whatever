@@ -1,7 +1,6 @@
 ﻿@using System.ComponentModel.DataAnnotations;
 @using CardsAgainstWhatever.Shared.Dtos.Events
-@using Microsoft.AspNetCore.SignalR.Client
-@inject HubConnection HubConnection
+@inject IGameServer GameServer
 @inject BlazorComponentBus.ComponentBus Bus
 
 <EditForm Model="@JoinModel" OnValidSubmit="@HandleValidSubmit">
@@ -37,13 +36,11 @@
 
     JoinForm JoinModel = new JoinForm();
 
-    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
-
     private async Task HandleValidSubmit()
     {
         try
         {
-            var joinResponse = await HubConnection.InvokeAsync<GameJoinedEvent>(nameof(IGameServer.JoinGame), new JoinGameAction
+            var joinResponse = await GameServer.JoinGame(new JoinGameAction
             {
                 GameCode = JoinModel.GameCode,
                 Username = JoinModel.Username

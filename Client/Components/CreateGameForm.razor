@@ -4,8 +4,7 @@
 @using CsvHelper.Configuration
 @using System.ComponentModel.DataAnnotations;
 @using CardsAgainstWhatever.Shared.Dtos.Events
-@using Microsoft.AspNetCore.SignalR.Client
-@inject HubConnection HubConnection
+@inject IGameServer GameServer
 @inject BlazorComponentBus.ComponentBus Bus
 
 
@@ -74,19 +73,17 @@
         CreateModel.FileName = e.File.Name;
     }
 
-    public bool IsConnected => HubConnection.State == HubConnectionState.Connected;
-
     private async Task HandleValidSubmit()
     {
         try
         {
-            var createResponse = await HubConnection.InvokeAsync<GameCreatedEvent>(nameof(IGameServer.CreateGame), new CreateGameAction
+            var createResponse = await GameServer.CreateGame(new CreateGameAction
             {
                 QuestionCards = CreateModel.Questions,
                 AnswerCards = CreateModel.Answers
             });
 
-            var joinResponse = await HubConnection.InvokeAsync<GameJoinedEvent>(nameof(IGameServer.JoinGame), new JoinGameAction
+            var joinResponse = await GameServer.JoinGame(new JoinGameAction
             {
                 GameCode = createResponse.GameCode,
                 Username = CreateModel.Username

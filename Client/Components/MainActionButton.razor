@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.SignalR.Client
-@inject HubConnection HubConnection
+﻿@inject IGameServer GameServer
 @inject BlazorComponentBus.ComponentBus Bus
 
 @if (Label != string.Empty)
@@ -47,7 +46,7 @@
         Label = "Start Game";
         OnClick = async () =>
         {
-            await HubConnection.SendAsync(nameof(IGameServer.StartRound), new StartRoundAction
+            await GameServer.StartRound(new StartRoundAction
             {
                 GameCode = Code
             });
@@ -78,7 +77,7 @@
             IsEnabled = false;
             OnClick = async () =>
             {
-                await HubConnection.SendAsync(nameof(IGameServer.PlayPlayerMove), new PlayAnswerAction
+                await GameServer.PlayAnswer(new PlayAnswerAction
                 {
                     GameCode = Code,
                     Username = Username,
@@ -104,7 +103,7 @@
             IsEnabled = false;
             OnClick = async () =>
             {
-                await HubConnection.SendAsync(nameof(IGameServer.PlayCardCzarMove), new PickWinnerAnswerAction
+                await GameServer.PickWinningAnswer(new PickWinnerAnswerAction
                 {
                     GameCode = Code,
                     WinningCards = SelectedCards,
@@ -162,7 +161,7 @@
         Label = "Start New Round";
         OnClick = async () =>
         {
-            await HubConnection.SendAsync(nameof(IGameServer.StartRound), new StartRoundAction
+            await GameServer.StartRound(new StartRoundAction
             {
                 GameCode = Code
             });

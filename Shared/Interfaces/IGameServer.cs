@@ -9,7 +9,7 @@ namespace CardsAgainstWhatever.Shared.Interfaces
         Task<GameCreatedEvent> CreateGame(CreateGameAction request);
         Task<GameJoinedEvent> JoinGame(JoinGameAction request);
         Task StartRound(StartRoundAction startRoundEvent);
-        Task PlayPlayerMove(PlayAnswerAction playCardsEvent);
-        Task PlayCardCzarMove(PickWinnerAnswerAction playCardsEvent);
+        Task PlayAnswer(PlayAnswerAction playCardsEvent);
+        Task PickWinningAnswer(PickWinnerAnswerAction playCardsEvent);
     }
 }

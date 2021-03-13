@@ -43,14 +43,14 @@ namespace CardsAgainstWhatever.Server.Hubs
             GameCode = request.GameCode
         });
 
-        public Task PlayPlayerMove(PlayAnswerAction request) => mediator.Send(new PlayAnswerCommand
+        public Task PlayAnswer(PlayAnswerAction request) => mediator.Send(new PlayAnswerCommand
         {
             GameCode = request.GameCode,
             Username = request.Username,
             SelectedAnswerCards = request.PlayedCards
         });
 
-        public Task PlayCardCzarMove(PickWinnerAnswerAction request) => mediator.Send(new PickWinningAnswerCommand
+        public Task PickWinningAnswer(PickWinnerAnswerAction request) => mediator.Send(new PickWinningAnswerCommand
         {
             GameCode = request.GameCode,
             SelectedWinningAnswerCards = request.WinningCards
