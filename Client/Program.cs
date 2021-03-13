@@ -1,5 +1,7 @@
 using BlazorComponentBus;
+using CardsAgainstWhatever.Client.Services;
 using CardsAgainstWhatever.Shared;
+using CardsAgainstWhatever.Shared.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -21,12 +23,15 @@ namespace CardsAgainstWhatever.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddSingleton(sp => new HubConnectionBuilder()
                 .WithUrl(sp.GetService<NavigationManager>().ToAbsoluteUri("/gamehub"))
                 .WithAutomaticReconnect()
                 .Build());
+
             builder.Services.AddScoped<ComponentBus>();
+
+            builder.Services.AddScoped<IGameServer, GameServerProxy>();
+            builder.Services.AddScoped<IGameClient, GameClientListener>();
 
             await builder.Build().RunAsync();
         }
