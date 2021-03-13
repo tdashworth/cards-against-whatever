@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,6 +35,7 @@ namespace CardsAgainstWhatever.Server
 
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
+            services.AddSingleton<IUserIdProvider, QueryStringUserIdProvider>();
             services.AddScoped<IGameRepositoy, GameRepository>();
             services.AddScoped<IHubContextFascade<IGameClient>, HubContextFascade<GameHub, IGameClient>>();
         }

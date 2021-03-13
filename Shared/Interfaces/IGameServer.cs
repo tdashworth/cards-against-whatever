@@ -6,8 +6,6 @@ namespace CardsAgainstWhatever.Shared.Interfaces
 {
     public interface IGameServer
     {
-        Task<GameCreatedEvent> CreateGame(CreateGameAction request);
-        Task<GameJoinedEvent> JoinGame(JoinGameAction request);
         Task StartRound(StartRoundAction startRoundEvent);
         Task PlayAnswer(PlayAnswerAction playCardsEvent);
         Task PickWinningAnswer(PickWinnerAnswerAction playCardsEvent);

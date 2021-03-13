@@ -25,18 +25,22 @@ namespace CardsAgainstWhatever.Server.Hubs
             this.mediator = mediator;
         }
 
-        public Task<GameCreatedEvent> CreateGame(CreateGameAction request) => mediator.Send(new CreateGameCommand
-        {
-            QuestionCards = request.QuestionCards,
-            AnswerCards = request.AnswerCards
-        });
+        private string GameCode => this.Context?.GetHttpContext()?.Request?.Query["GameCode"];
+        private string Username => this.Context?.UserIdentifier;
 
-        public Task<GameJoinedEvent> JoinGame(JoinGameAction request) => mediator.Send(new JoinGameCommand
+        public override async Task OnConnectedAsync()
         {
-            GameCode = request.GameCode,
-            Username = request.Username,
-            ConnectionId = Context.ConnectionId
-        });
+            // TODO: Validate GameCode and Username
+            
+            await mediator.Send(new JoinGameCommand
+            {
+                ConnectionId = Context.ConnectionId,
+                Username = Username,
+                GameCode = GameCode
+            });
+
+            await base.OnConnectedAsync();
+        }
 
         public Task StartRound(StartRoundAction request) => mediator.Send(new StartRoundCommand
         {
