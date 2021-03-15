@@ -1,19 +1,20 @@
-﻿@inject BlazorComponentBus.ComponentBus Bus
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
 
 <section class="card" style="@CssStyle">
     <div class="card-body">
-        @if (QuestionCard != null)
+        @if (GameState.Value.CurrentQuestion is not null)
         {
             <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
                 <div class="dummy"></div>
                 <header class="game-card-header">
-                    <h3>@QuestionCard.Text</h3>
+                    <h3>@GameState.Value.CurrentQuestion.Text</h3>
                 </header>
 
-                @if (QuestionCard.Picks > 1)
+                @if (GameState.Value.CurrentQuestion.Picks > 1)
                 {
                     <div class="game-card-footer">
-                        <span>Pick @QuestionCard.Picks</span>
+                        <span>Pick @GameState.Value.CurrentQuestion.Picks</span>
                     </div>
                 }
             </article>
@@ -23,18 +24,6 @@
 
 @code {
     [Parameter]
-    public string CssStyle { get; set; }
+    public string CssStyle { get; set; } = string.Empty;
 
-    private QuestionCard QuestionCard;
-
-    protected override void OnInitialized()
-    {
-        Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
-    }
-
-    void OnRoundStarted(RoundStartedEvent roundStartedEvent)
-    {
-        QuestionCard = roundStartedEvent.QuestionCard;
-        StateHasChanged();
-    }
 }

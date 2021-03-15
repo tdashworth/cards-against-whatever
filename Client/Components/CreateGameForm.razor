@@ -2,10 +2,12 @@
 @using System.Globalization
 @using CsvHelper
 @using CsvHelper.Configuration
-@using System.ComponentModel.DataAnnotations;
+@using System.ComponentModel.DataAnnotations
+@using CardsAgainstWhatever.Shared.Dtos.Actions
 @using CardsAgainstWhatever.Shared.Dtos.Events
-@inject IGameServerProxy GameServer
-@inject BlazorComponentBus.ComponentBus Bus
+@inherits FluxorComponent
+@inject HttpClient HttpClient
+@inject IDispatcher Dispatcher
 
 
 <EditForm Model="@CreateModel" OnValidSubmit="@HandleValidSubmit">
@@ -37,9 +39,9 @@
     {
         [Required]
         [StringLength(10, ErrorMessage = "Name is too long.")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
         public List<QuestionCard> Questions = new();
 
@@ -75,26 +77,17 @@
 
     private async Task HandleValidSubmit()
     {
-        try
-        {
-            var createResponse = await GameServer.CreateGame(new CreateGameAction
-            {
-                QuestionCards = CreateModel.Questions,
-                AnswerCards = CreateModel.Answers
-            });
 
-            await GameServer.JoinGame(new JoinGameAction
-            {
-                GameCode = createResponse.GameCode,
-                Username = CreateModel.Username
-            });
-
-            // Loading?
-        }
-        catch (Exception)
+        var response = await HttpClient.PostAsJsonAsync("api/game", new CreateGameAction
         {
-            //TODO
-        }
+            QuestionCards = CreateModel.Questions,
+            AnswerCards = CreateModel.Answers
+        });
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadFromJsonAsync<GameCreatedEvent>();
+
+        Dispatcher.Dispatch(new CardsAgainstWhatever.Client.Stores.Game.JoinGameAction(content!.GameCode, CreateModel.Username!));
     }
 
     enum CardType { Question, Answer };

@@ -15,7 +15,7 @@ namespace CardsAgainstWhatever.Server.Commands
     public class PickWinningAnswerCommand : IRequest
     {
         public string GameCode { get; set; }
-        public List<AnswerCard> SelectedWinningAnswerCards { get; set; }
+        public IEnumerable<AnswerCard> SelectedWinningAnswerCards { get; set; }
     }
 
     class PickWinningAnswerHandler : BaseGameRequestHandler<PickWinningAnswerCommand>

@@ -1,4 +1,6 @@
-﻿
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+
 <div id="game-board" class="p-4">
     <DetailsPane CssStyle="grid-column: 1 / 2; grid-row: 1;" />
 
@@ -6,8 +8,14 @@
 
     <PlayersListPane CssStyle="grid-column: 3 / 4; grid-row: 1;" />
 
-    <CardsInHandPane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
-    <CardsOnTablePane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
+    @if (GameState.Value.IsCardCzar || GameState.Value.Me?.State == PlayerState.AnswerPlayed)
+    {
+        <CardsOnTablePane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
+    }
+    else
+    {
+        <CardsInHandPane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
+    }
 </div>
 
 @code {
