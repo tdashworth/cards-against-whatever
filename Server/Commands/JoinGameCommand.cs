@@ -38,12 +38,6 @@ namespace CardsAgainstWhatever.Server.Commands
             };
 
             game.Players.Add(player);
-            await hubContextFascade.JoinGroup(request.GameCode, request.ConnectionId);
-
-            await allPlayersClient.PlayerJoined(new PlayerJoinedEvent
-            {
-                NewPlayer = player
-            });
 
             await callingPlayerClient.GameJoined(new GameJoinedEvent
             {
@@ -51,6 +45,13 @@ namespace CardsAgainstWhatever.Server.Commands
                 Username = request.Username,
                 ExistingPlayersInGame = game.Players.Cast<Player>().ToList()
             });
+
+            await allPlayersClient.PlayerJoined(new PlayerJoinedEvent
+            {
+                NewPlayer = player
+            });
+
+            await hubContextFascade.JoinGroup(request.GameCode, request.ConnectionId);
 
             return Unit.Value;
         }

@@ -1,4 +1,6 @@
-﻿@inject BlazorComponentBus.ComponentBus Bus
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+@inject IDispatcher Dispatcher
 
 <section class="card" style="@CssStyle">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -6,13 +8,13 @@
         <button type="button" class="btn btn-sm btn-danger">Leave</button>
     </div>
     <div class="card-body">
-        <p>Game Code: <b>@Code</b></p>
-        <p>Username: <b>@Username</b></p>
+        <p>Game Code: <b>@GameState.Value.GameCode</b></p>
+        <p>Username: <b>@GameState.Value.Username</b></p>
         <p>
             <hr>
         </p>
-        <p>Round: <b>@RoundNumber</b></p>
-        <p>Card Czar: <b>@CardCzar?.Username</b></p>
+        <p>Round: <b>@GameState.Value.CurrentRoundNumber</b></p>
+        <p>Card Czar: <b>@GameState.Value.CurrentCardCzar?.Username</b></p>
         <p>
             <hr>
         </p>
@@ -24,32 +26,6 @@
 
 @code {
     [Parameter]
-    public string CssStyle { get; set; }
-
-    private string Code;
-    private string Username;
-    private int RoundNumber;
-    private Player CardCzar;
-
-
-    protected override void OnInitialized()
-    {
-        Bus.Subscribe<GameJoinedEvent>(args => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
-        Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
-    }
-
-    void OnGameJoined(GameJoinedEvent gameJoinedEvent)
-    {
-        Code = gameJoinedEvent.Code;
-        Username = gameJoinedEvent.Username;
-        StateHasChanged();
-    }
-
-    void OnRoundStarted(RoundStartedEvent roundStartedEvent)
-    {
-        RoundNumber = roundStartedEvent.RoundNumber;
-        CardCzar = roundStartedEvent.CardCzar;
-        StateHasChanged();
-    }
+    public string CssStyle { get; set; } = string.Empty;
 
 }

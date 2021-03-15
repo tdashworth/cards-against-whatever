@@ -42,22 +42,22 @@ namespace CardsAgainstWhatever.Server.Hubs
             await base.OnConnectedAsync();
         }
 
-        public Task StartRound(StartRoundAction request) => mediator.Send(new StartRoundCommand
+        public Task StartRound() => mediator.Send(new StartRoundCommand
         {
-            GameCode = request.GameCode
+            GameCode = GameCode
         });
 
-        public Task PlayAnswer(PlayAnswerAction request) => mediator.Send(new PlayAnswerCommand
+        public Task PlayAnswer(IEnumerable<AnswerCard> answerCards) => mediator.Send(new PlayAnswerCommand
         {
-            GameCode = request.GameCode,
-            Username = request.Username,
-            SelectedAnswerCards = request.PlayedCards
+            GameCode = GameCode,
+            Username = Username,
+            SelectedAnswerCards = answerCards
         });
 
-        public Task PickWinningAnswer(PickWinnerAnswerAction request) => mediator.Send(new PickWinningAnswerCommand
+        public Task PickWinningAnswer(IEnumerable<AnswerCard> answerCards) => mediator.Send(new PickWinningAnswerCommand
         {
-            GameCode = request.GameCode,
-            SelectedWinningAnswerCards = request.WinningCards
+            GameCode = GameCode,
+            SelectedWinningAnswerCards = answerCards
         });
 
     }

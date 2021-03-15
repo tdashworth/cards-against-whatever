@@ -1,26 +1,16 @@
 ﻿@page "/"
-@inject BlazorComponentBus.ComponentBus Bus
+@inherits FluxorComponent
+@inject IState<GameState> GameState
 
 <GameBoard />
 
-@if (NewGame)
+@if (GameState.Value.GameCode is null)
 {
     <StartupModal />
 }
 
 
 @code {
-    bool NewGame = true;
 
-    protected override void OnInitialized()
-    {
 
-        Bus.Subscribe<GameJoinedEvent>((args) => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
-    }
-
-    private void OnGameJoined(GameJoinedEvent gameJoinedEvent)
-    {
-        NewGame = false;
-        StateHasChanged();
-    }
 }

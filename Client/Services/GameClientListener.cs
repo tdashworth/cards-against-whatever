@@ -1,32 +1,52 @@
-﻿using BlazorComponentBus;
+﻿using CardsAgainstWhatever.Client.Stores.Game;
 using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Fluxor;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Services
 {
     public class GameClientListener : IGameClient
     {
-        private readonly BlazorComponentBus.ComponentBus Bus;
+        private readonly IDispatcher dispatcher;
 
-        public GameClientListener(ComponentBus bus)
+        public GameClientListener(IDispatcher dispatcher)
         {
-            Bus = bus;
+            this.dispatcher = dispatcher;
         }
 
-        public Task GameJoined(GameJoinedEvent gameJoinedEvent) => Bus.Publish(gameJoinedEvent);
+        public Task GameJoined(CardsAgainstWhatever.Shared.Dtos.Events.GameJoinedEvent gameJoinedEvent) => Task.Run(() =>
+        {
+            dispatcher.Dispatch(new Stores.Game.GameJoinedEvent(gameJoinedEvent.ExistingPlayersInGame));
+        });
 
-        public Task PlayerJoined(PlayerJoinedEvent playerJoinedEvent) => Bus.Publish(playerJoinedEvent);
+        public Task PlayerJoined(CardsAgainstWhatever.Shared.Dtos.Events.PlayerJoinedEvent playerJoinedEvent) => Task.Run(() =>
+        {
+            dispatcher.Dispatch(new Stores.Game.PlayerJoinedEvent(playerJoinedEvent.NewPlayer));
+        });
 
-        public Task RoundStarted(RoundStartedEvent roundStartedEvent) => Bus.Publish(roundStartedEvent);
+        public Task RoundStarted(CardsAgainstWhatever.Shared.Dtos.Events.RoundStartedEvent roundStartedEvent) => Task.Run(() =>
+        {
+            dispatcher.Dispatch(new Stores.Game.RoundStartedEvent(
+                roundStartedEvent.RoundNumber,
+                roundStartedEvent.QuestionCard, 
+                roundStartedEvent.CardCzar.Username,
+                roundStartedEvent.DealtCards));
+        });
 
-        public Task PlayerMoved(PlayerMovedEvent playerMovedEvent) => Bus.Publish(playerMovedEvent);
+        public Task PlayerMoved(PlayerMovedEvent playerMovedEvent) => Task.Run(() =>
+        {
+            dispatcher.Dispatch(new AnswerPlayedEvent(playerMovedEvent.Username));
+        });
 
-        public Task RoundClosed(RoundClosedEvent roundClosedEvent) => Bus.Publish(roundClosedEvent);
+        public Task RoundClosed(CardsAgainstWhatever.Shared.Dtos.Events.RoundClosedEvent roundClosedEvent) => Task.Run(() =>
+        {
+            dispatcher.Dispatch(new Stores.Game.RoundClosedEvent(roundClosedEvent.PlayedCardsGroupedPerPlayer));
+        });
 
-        public Task RoundEnded(RoundEndedEvent roundEndedEvent) => Bus.Publish(roundEndedEvent);
+        public Task RoundEnded(CardsAgainstWhatever.Shared.Dtos.Events.RoundEndedEvent roundEndedEvent) => Task.Run(() =>
+        {
+            dispatcher.Dispatch(new Stores.Game.RoundEndedEvent(roundEndedEvent.Winner.Username));
+        });
     }
 }

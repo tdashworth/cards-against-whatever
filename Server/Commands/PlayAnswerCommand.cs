@@ -15,7 +15,7 @@ namespace CardsAgainstWhatever.Server.Commands
     {
         public string GameCode { get; set; }
         public string Username { get; set; }
-        public List<AnswerCard> SelectedAnswerCards { get; set; }
+        public IEnumerable<AnswerCard> SelectedAnswerCards { get; set; }
     }
 
     class PlayAnswerHandler : BaseGameRequestHandler<PlayAnswerCommand>
@@ -34,14 +34,16 @@ namespace CardsAgainstWhatever.Server.Commands
                 throw new Exception($"Player {request.Username} not found in game {request.GameCode}.");
             }
 
-            player.PlayedCards = request.SelectedAnswerCards;
-            player.State = PlayerState.MovePlayed;
+            player.PlayedCards = request.SelectedAnswerCards.ToList();
+            player.State = PlayerState.AnswerPlayed;
 
             await gameGroupClient.PlayerMoved(new PlayerMovedEvent { Username = request.Username });
 
             var allPlayersMadeMove = game.Players
                 .Where(player => player != game.CurrentCardCzar)
                 .All(player => player.PlayedCards.Any());
+
+            Thread.Sleep(2000);
 
             if (allPlayersMadeMove)
             {

@@ -9,9 +9,10 @@ namespace CardsAgainstWhatever.Shared.Models
     public enum PlayerState
     {
         InLobby,
-        PlayingMove,
-        MovePlayed,
-        CardCzarAwaitingMoves,
+        PlayingAnswer,
+        AnswerPlayed,
+        AwatingAnswers,
+        PickingWinner
     }
 
     public class Player

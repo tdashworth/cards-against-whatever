@@ -1,95 +1,43 @@
-﻿@inject BlazorComponentBus.ComponentBus Bus
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+@inject IDispatcher Dispatcher
 
-<section class="card" style="@(IsDiplayed ? string.Empty : "display: none;") @CssStyle">
+<section class="card" style="@CssStyle">
     <div class="card-header">
         <b>Your Hand</b>
     </div>
     <div class="card-body p-0">
-        <div class="game-card-list">
-            @foreach (var card in CardsInHand)
-            {
-                <article class="game-card selectable-game-card answer-card" @onclick="() => OnCardSelected(card)">
-                    <div class="dummy"></div>
-                    <header class="game-card-header">
-                        <h3>@card.Text</h3>
-                    </header>
-                    @if (SelectedCards.Contains(card))
-                    {
-                        <div class="game-card-footer">
-                            <span>Picked</span>
-                        </div>
-                    }
-                </article>
-            }
-        </div>
+        @if (GameState.Value.CardsInHand is null)
+        {
+            <p>You don't have any cards in your hand right now.</p>
+        }
+        else
+        {
+
+            <div class="game-card-list">
+                @foreach (var card in GameState.Value.CardsInHand)
+                {
+                    <article class="game-card selectable-game-card answer-card" @onclick="() => OnCardSelected(card)">
+                        <div class="dummy"></div>
+                        <header class="game-card-header">
+                            <h3>@card.Text</h3>
+                        </header>
+                        @if (GameState.Value.SelectedCardsInHand?.Contains(card) ?? false)
+                        {
+                            <div class="game-card-footer">
+                                <span>Picked</span>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
     </div>
 </section>
 
 @code {
     [Parameter]
-    public string CssStyle { get; set; }
+    public string CssStyle { get; set; } = string.Empty;
 
-    QuestionCard QuestionCard;
-    List<AnswerCard> CardsInHand = new();
-    List<AnswerCard> SelectedCards = new();
-    private string Username;
-    private bool IsCardCzar;
-    private bool IsDiplayed = true;
-    bool IsSinglePickQuestion { get => QuestionCard.Picks == 1; }
-    bool HasSelectedRequiredCards { get => SelectedCards.Count == QuestionCard.Picks; }
-
-    protected override void OnInitialized()
-    {
-        Bus.Subscribe<GameJoinedEvent>(args => OnGameJoined(args.GetMessage<GameJoinedEvent>()));
-        Bus.Subscribe<RoundStartedEvent>(args => OnRoundStarted(args.GetMessage<RoundStartedEvent>()));
-        Bus.Subscribe<PlayerMovedEvent>(args => OnPlayerMoved(args.GetMessage<PlayerMovedEvent>()));
-    }
-
-    private void OnGameJoined(GameJoinedEvent gameJoinedEvent)
-    {
-        Username = gameJoinedEvent.Username;
-    }
-
-    void OnRoundStarted(RoundStartedEvent roundStartedEvent)
-    {
-        QuestionCard = roundStartedEvent.QuestionCard;
-        CardsInHand.AddRange(roundStartedEvent.DealtCards);
-        IsCardCzar = roundStartedEvent.CardCzar.Username == Username;
-        IsDiplayed = !IsCardCzar;
-        SelectedCards = new();
-
-        StateHasChanged();
-    }
-
-    void OnPlayerMoved(PlayerMovedEvent playerMovedEvent)
-    {
-        if (playerMovedEvent.Username == Username && IsDiplayed)
-        {
-            IsDiplayed = false;
-        }
-        StateHasChanged();
-    }
-
-    void OnCardSelected(AnswerCard card)
-    {
-        if (IsSinglePickQuestion)
-        {
-            SelectedCards.Clear();
-            SelectedCards.Add(card);
-        }
-        else
-        {
-            if (SelectedCards.Contains(card))
-            {
-                SelectedCards.Remove(card);
-            }
-            else if (SelectedCards.Count < QuestionCard.Picks)
-            {
-                SelectedCards.Add(card);
-            }
-        }
-
-        Bus.Publish(new CardSelectedEvent { SelectedCards = SelectedCards });
-        StateHasChanged();
-    }
+    void OnCardSelected(AnswerCard card) => Dispatcher.Dispatch(new AnswerSelectedAction(card));
 }

@@ -1,6 +1,6 @@
 ﻿@using System.ComponentModel.DataAnnotations;
-@inject IGameServerProxy GameServer;
-@inject BlazorComponentBus.ComponentBus Bus;
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
 
 <EditForm Model="@JoinModel" OnValidSubmit="@HandleValidSubmit">
     <h3>Join Game</h3>
@@ -26,30 +26,17 @@
     {
         [Required]
         [StringLength(10, ErrorMessage = "Name is too long.")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [Required]
         [StringLength(5, ErrorMessage = "Code is too long.")]
-        public string GameCode { get; set; }
+        public string? GameCode { get; set; }
     }
 
     JoinForm JoinModel = new JoinForm();
 
     private async Task HandleValidSubmit()
     {
-        try
-        {
-            await GameServer.JoinGame(new JoinGameAction
-            {
-                GameCode = JoinModel.GameCode,
-                Username = JoinModel.Username
-            });
-
-            // Loading?
-        }
-        catch (Exception)
-        {
-            //TODO
-        }
+        Dispatcher.Dispatch(new CardsAgainstWhatever.Client.Stores.Game.JoinGameAction(JoinModel.GameCode!, JoinModel.Username!));
     }
 }

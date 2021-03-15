@@ -34,7 +34,7 @@ namespace CardsAgainstWhatever.Server.Commands
                 var newCards = game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count);
                 player.CardsInHand.AddRange(newCards);
                 player.PlayedCards.Clear();
-                player.State = PlayerState.PlayingMove;
+                player.State = PlayerState.PlayingAnswer;
 
                 return playerClient.RoundStarted(new RoundStartedEvent
                 {
@@ -45,7 +45,7 @@ namespace CardsAgainstWhatever.Server.Commands
                 });
             }));
 
-            game.CurrentCardCzar.State = PlayerState.CardCzarAwaitingMoves;
+            game.CurrentCardCzar.State = PlayerState.AwatingAnswers;
 
             return Unit.Value;
         }
