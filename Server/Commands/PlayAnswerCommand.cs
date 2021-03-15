@@ -39,18 +39,16 @@ namespace CardsAgainstWhatever.Server.Commands
 
             await gameGroupClient.PlayerMoved(new PlayerMovedEvent { Username = request.Username });
 
-            var allPlayersMadeMove = game.Players
-                .Where(player => player != game.CurrentCardCzar)
-                .All(player => player.PlayedCards.Any());
+            var allPlayersMadeMove = game.Players.All(player => player.State != PlayerState.PlayingAnswer);
 
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             if (allPlayersMadeMove)
             {
                 await gameGroupClient.RoundClosed(new RoundClosedEvent
                 {
                     PlayedCardsGroupedPerPlayer = game.Players
-                        .Where(player => player != game.CurrentCardCzar)
+                        .Where(player => player.State == PlayerState.AnswerPlayed)
                         .Select(player => player.PlayedCards).ToList()
                 });
             }
