@@ -1,4 +1,5 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Extensions;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
@@ -7,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CardsAgainstWhatever.Server.Extensions;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
@@ -27,7 +27,7 @@ namespace CardsAgainstWhatever.Server.Commands
             var random = new Random();
 
             var gameCode = await gameRepositoy.Create(
-                request.QuestionCards.Shuffle(random), 
+                request.QuestionCards.Shuffle(random),
                 request.AnswerCards.Shuffle(random));
 
             return new GameCreatedEvent(gameCode);

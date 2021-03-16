@@ -6,7 +6,8 @@
         PlayingAnswer,
         AnswerPlayed,
         AwatingAnswers,
-        PickingWinner
+        PickingWinner,
+        Left,
     }
 
     public class Player

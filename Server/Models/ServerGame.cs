@@ -1,7 +1,6 @@
 ﻿using CardsAgainstWhatever.Shared.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CardsAgainstWhatever.Server.Models
 {
@@ -31,14 +30,15 @@ namespace CardsAgainstWhatever.Server.Models
                 throw new Exception("Not enough players!");
             }
 
-            if (CurrentCardCzar == null)
+            var nextPlayerIndex = CurrentCardCzar is null
+                ? 0
+                : (Players.FindIndex(player => player == CurrentCardCzar) + 1) % Players.Count;
+
+            while (Players[nextPlayerIndex].State == PlayerState.Left)
             {
-                CurrentCardCzar = Players.First();
-                return;
+                nextPlayerIndex = (nextPlayerIndex + 1) % Players.Count;
             }
 
-            var currentPlayerIndex = Players.FindIndex(player => player == CurrentCardCzar);
-            var nextPlayerIndex = (currentPlayerIndex + 1) % Players.Count;
             CurrentCardCzar = Players[nextPlayerIndex];
         }
 

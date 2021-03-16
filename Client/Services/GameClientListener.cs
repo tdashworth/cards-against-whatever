@@ -22,6 +22,9 @@ namespace CardsAgainstWhatever.Client.Services
         public Task PlayerJoined(Player newPlayer)
             => Task.Run(() => dispatcher.Dispatch(new PlayerJoinedEvent(newPlayer)));
 
+        public Task PlayerLeft(Player newPlayer)
+            => Task.Run(() => dispatcher.Dispatch(new PlayerLeftEvent(newPlayer)));
+
         public Task RoundStarted(int currentRoundNumber, QuestionCard currentQuestion, Player currentCardCzar, List<AnswerCard> dealtCards)
             => Task.Run(() => dispatcher.Dispatch(new RoundStartedEvent(currentRoundNumber, currentQuestion, currentCardCzar.Username, dealtCards)));
 

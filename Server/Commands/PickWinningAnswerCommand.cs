@@ -35,8 +35,18 @@ namespace CardsAgainstWhatever.Server.Commands
             }
 
             winner.WonCards.Add(game.CurrentQuestion!);
+            winner.Score++;
 
-            await gameGroupClient.RoundEnded(winner);
+            foreach (var player in game.Players)
+            {
+                if (player.State != PlayerState.Left)
+                {
+                    player.State = PlayerState.InLobby;
+                }
+                player.PlayedCards.Clear();
+            }
+
+            await gameGroupClient.RoundEnded((Player)winner);
 
             return Unit.Value;
         }

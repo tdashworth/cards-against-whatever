@@ -19,8 +19,13 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class PlayAnswerHandler : BaseGameRequestHandler<PlayAnswerCommand>
     {
-        public PlayAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
-            : base(gameRepositoy, hubContextFascade) { }
+        private readonly IMediator mediator;
+
+        public PlayAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, IMediator mediator)
+            : base(gameRepositoy, hubContextFascade)
+        {
+            this.mediator = mediator;
+        }
 
         public async override Task<Unit> Handle(PlayAnswerCommand request, CancellationToken cancellationToken)
         {
@@ -38,18 +43,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             await gameGroupClient.PlayerMoved(player);
 
-            var haveAllPlayersMadeMove = game.Players.All(player => player.State != PlayerState.PlayingAnswer);
-
-            Thread.Sleep(1000);
-
-            if (haveAllPlayersMadeMove)
-            {
-                var playedCardsGroupedPerPlayer = game.Players
-                        .Where(player => player.State == PlayerState.AnswerPlayed)
-                        .Select(player => player.PlayedCards).ToList();
-
-                await gameGroupClient.RoundClosed(playedCardsGroupedPerPlayer);
-            }
+            await mediator.Send(new CloseRoundCommand(request.GameCode));
 
             return Unit.Value;
         }

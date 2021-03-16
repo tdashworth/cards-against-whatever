@@ -38,6 +38,13 @@ namespace CardsAgainstWhatever.Server.Hubs
             await base.OnConnectedAsync();
         }
 
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            await mediator.Send(new LeaveGameCommand(GameCode!, Username!));
+
+            await base.OnDisconnectedAsync(exception);
+        }
+
         public Task StartRound()
             => mediator.Send(new StartRoundCommand(GameCode!));
 

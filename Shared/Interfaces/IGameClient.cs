@@ -14,6 +14,8 @@ namespace CardsAgainstWhatever.Shared.Interfaces
 
         Task PlayerJoined(Player newPlayer);
 
+        Task PlayerLeft(Player newPlayer);
+
         Task RoundStarted(
             int currentRoundNumber,
             QuestionCard currentQuestion,

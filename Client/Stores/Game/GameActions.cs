@@ -39,7 +39,23 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         public static GameState Reduce(GameState state, PlayerJoinedEvent action)
             => state with
             {
-                Players = state.Players!.CopyAndUpdate(players => players.Add(action.Player))
+                Players = state.Players!.CopyAndUpdate(players =>
+                {
+                    players.RemoveAll(player => player.Username == action.Player.Username);
+                    players.Add(action.Player);
+                })
+            };
+    }
+
+    public record PlayerLeftEvent(Player Player)
+    {
+        [ReducerMethod]
+        public static GameState Reduce(GameState state, PlayerLeftEvent action)
+            => state with
+            {
+                Players = state.Players!.CopyAndUpdate(players => players
+                    .FindByUsername(action.Player.Username)
+                    .Update(player => player!.State = PlayerState.Left))
             };
     }
 
@@ -61,7 +77,13 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             {
                 IsLoading = false,
                 Status = GameStatus.CollectingAnswers,
-                Players = state.Players!.UpdateEach(player => player.State = PlayerState.PlayingAnswer).ToList(),
+                Players = state.Players!.UpdateEach(player =>
+                {
+                    if (player.State != PlayerState.Left)
+                    {
+                        player.State = PlayerState.PlayingAnswer;
+                    }
+                }).ToList(),
                 CurrentRoundNumber = action.CurrentRoundNumber,
                 CurrentQuestion = action.CurrentQuestion,
                 CurrentCardCzar = state.Players
@@ -171,7 +193,10 @@ namespace CardsAgainstWhatever.Client.Stores.Game
 
                     foreach (var player in players)
                     {
-                        player.State = PlayerState.InLobby;
+                        if (player.State != PlayerState.Left)
+                        {
+                            player.State = PlayerState.InLobby;
+                        }
                     }
                 }),
             };
