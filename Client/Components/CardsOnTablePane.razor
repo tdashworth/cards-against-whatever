@@ -7,9 +7,13 @@
         <b>Table</b>
     </div>
     <div class="card-body p-0">
-        @if (GameState.Value.CardsOnTable is null)
+        @if (GameState.Value.CardsOnTable is null || !GameState.Value.CardsOnTable.Any())
         {
-            <p>There are no cards on the table right now.</p>
+            <div class="h-100 w-100 d-flex justify-content-center align-items-center">
+                <p>
+                    There are no cards right now. Please wait for each player to play their answer.
+                </p>
+            </div>
         }
         else
         {

@@ -3,7 +3,15 @@
 
 <section class="card" style="@CssStyle">
     <div class="card-body">
-        @if (GameState.Value.CurrentQuestion is not null)
+        @if (GameState.Value.CurrentQuestion is null)
+        {
+            <div class="h-100 w-100 d-flex justify-content-center align-items-center">
+                <p>
+                    Start a round for a question card to be drawn.
+                </p>
+            </div>
+        }
+        else
         {
             <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
                 <div class="dummy"></div>

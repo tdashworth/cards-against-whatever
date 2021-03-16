@@ -7,9 +7,13 @@
         <b>Your Hand</b>
     </div>
     <div class="card-body p-0">
-        @if (GameState.Value.CardsInHand is null)
+        @if (GameState.Value.CardsInHand is null || !GameState.Value.CardsInHand.Any())
         {
-            <p>You don't have any cards in your hand right now.</p>
+            <div class="h-100 w-100 d-flex justify-content-center align-items-center">
+                <p>
+                    You don't have any cards right now. You'll be dealt cards at the start of each round.
+                </p>
+            </div>
         }
         else
         {

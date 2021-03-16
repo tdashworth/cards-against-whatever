@@ -5,9 +5,13 @@
     <div class="card-header">
         <b>Players</b>
     </div>
-    @if (GameState.Value.Players is null)
+    @if (GameState.Value.Players is null || !GameState.Value.Players.Any())
     {
-        <p>There aren't any players right now.</p>
+        <div class="h-100 w-100 d-flex justify-content-center align-items-center">
+            <p>
+                There are no players at the moment. Please wait for players to join.
+            </p>
+        </div>
     }
     else
     {
