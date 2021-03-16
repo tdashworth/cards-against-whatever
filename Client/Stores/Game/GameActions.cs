@@ -18,15 +18,18 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record GameJoinedEvent(List<Player> Players)
+    public record GameJoinedEvent(List<Player> ExistingPlayersInGame, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, GameJoinedEvent action)
             => state with
             {
                 IsLoading = false,
-                Players = action.Players,
+                Players = action.ExistingPlayersInGame,
                 CardsInHand = new List<AnswerCard>(),
+                CurrentRoundNumber = action.CurrentRoundNumber,
+                CurrentQuestion = action.CurrentQuestion,
+                CurrentCardCzar = action.CurrentCardCzar?.Username is not null ? state.Players.FindByUsername(action.CurrentCardCzar.Username) : null
             };
     }
 

@@ -9,13 +9,13 @@
 
     <PlayersListPane CssStyle="grid-column: 3 / 4; grid-row: 1;" />
 
-    @if (GameState.Value.IsCardCzar || GameState.Value.Me?.State == PlayerState.AnswerPlayed)
+    @if (GameState.Value.Me?.State == PlayerState.PlayingAnswer)
     {
-        <CardsOnTablePane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
+        <CardsInHandPane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
     }
     else
     {
-        <CardsInHandPane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
+        <CardsOnTablePane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
     }
 </div>
 
