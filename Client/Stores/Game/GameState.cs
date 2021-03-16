@@ -10,11 +10,18 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Stores.Game
 {
+    public enum GameStatus {
+        Lobby,
+        CollectingAnswers,
+        SelectingWinner,
+    }
+
     public record GameState(
         bool IsLoading,
         string? CurrentErrorMessage,
         string? GameCode,
         string? Username,
+        GameStatus Status,
         IReadOnlyList<Player>? Players,
         int? CurrentRoundNumber,
         QuestionCard? CurrentQuestion,
@@ -32,6 +39,6 @@ namespace CardsAgainstWhatever.Client.Stores.Game
     {
         public override string GetName() => "Game";
 
-        protected override GameState GetInitialState() => new GameState(false, null, null, null, null, null, null, null, null, null, null, null);
+        protected override GameState GetInitialState() => new GameState(false, null, null, null, GameStatus.Lobby, null, null, null, null, null, null, null, null);
     }
 }

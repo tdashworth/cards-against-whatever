@@ -48,7 +48,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         public static GameState Reduce(GameState state, StartRoundAction action)
             => state with
             {
-                IsLoading = true
+                IsLoading = true,
             };
     }
 
@@ -59,6 +59,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             => state with
             {
                 IsLoading = false,
+                Status = GameStatus.CollectingAnswers,
                 Players = state.Players!.UpdateEach(player => player.State = PlayerState.PlayingAnswer).ToList(),
                 CurrentRoundNumber = action.CurrentRoundNumber,
                 CurrentQuestion = action.CurrentQuestion,
@@ -149,6 +150,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         public static GameState Reduce(GameState state, RoundClosedEvent action)
             => state with
             {
+                Status = GameStatus.SelectingWinner,
                 CurrentCardCzar = state.CurrentCardCzar.Update(player => player!.State = PlayerState.PickingWinner),
                 CardsOnTable = action.PlayedCardsGroupedPerPlayer
             };
@@ -160,6 +162,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         public static GameState Reduce(GameState state, RoundEndedEvent action)
             => state with
             {
+                Status = GameStatus.Lobby,
                 Players = state.Players!.CopyAndUpdate(players =>
                 {
                     var winningPlayer = players.FindByUsername(action.Username);

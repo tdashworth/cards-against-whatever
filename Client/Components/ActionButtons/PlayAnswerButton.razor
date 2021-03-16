@@ -1,0 +1,25 @@
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+@inject IDispatcher Dispatcher
+
+<button type="button" class="btn btn-primary w-100" disabled="@(!IsEnabled)" @onclick="OnClick">
+    Play Answer
+</button>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p class="my-2 w-100 text-center">
+        @Message
+    </p>
+}
+
+@code {
+    bool IsEnabled => string.IsNullOrEmpty(Message);
+    string? Message => IsPickEnoughCards 
+        ? null 
+        : "Select the card(s) you wish to play.";
+
+    bool IsPickEnoughCards => GameState.Value.CurrentQuestion?.Picks == GameState.Value.SelectedCardsInHand?.Count;
+
+    void OnClick() => Dispatcher.Dispatch(new PlayAnswerAction());
+}

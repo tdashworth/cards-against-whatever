@@ -1,0 +1,25 @@
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+@inject IDispatcher Dispatcher
+
+<button type="button" class="btn btn-primary w-100" disabled="@(!IsEnabled)" @onclick="OnClick">
+    Confirm Winner
+</button>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p class="my-2 w-100 text-center">
+        @Message
+    </p>
+}
+
+@code {
+    bool IsEnabled => string.IsNullOrEmpty(Message);
+    string? Message => IsCardSetSelected
+        ? null
+        : "Select the card(s) that most made you laugh.";
+
+    bool IsCardSetSelected => GameState.Value.SelectedCardsOnTable!.Any();
+
+    void OnClick() => Dispatcher.Dispatch(new PickWinnerAction());
+}

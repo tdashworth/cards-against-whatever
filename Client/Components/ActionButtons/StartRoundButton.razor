@@ -1,0 +1,21 @@
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+@inject IDispatcher Dispatcher
+
+<button type="button" class="btn btn-primary w-100" disabled="@(!IsEnabled)" @onclick="OnClick">
+    Start Round
+</button>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p class="my-2 w-100 text-center">
+        @Message
+    </p>
+}
+
+@code {
+    bool IsEnabled = true;
+    string? Message = null;
+
+    void OnClick() => Dispatcher.Dispatch(new StartRoundAction());
+}
