@@ -1,5 +1,4 @@
 ﻿using CardsAgainstWhatever.Server.Services.Interfaces;
-using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
@@ -11,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
-    public class PlayAnswerCommand : IRequest
-    {
-        public string GameCode { get; set; }
-        public string Username { get; set; }
-        public IEnumerable<AnswerCard> SelectedAnswerCards { get; set; }
-    }
+    public record PlayAnswerCommand(
+        string GameCode,
+        string Username,
+        IEnumerable<AnswerCard> SelectedAnswerCards)
+
+        : IRequest;
 
     class PlayAnswerHandler : BaseGameRequestHandler<PlayAnswerCommand>
     {
@@ -37,20 +36,19 @@ namespace CardsAgainstWhatever.Server.Commands
             player.PlayedCards = request.SelectedAnswerCards.ToList();
             player.State = PlayerState.AnswerPlayed;
 
-            await gameGroupClient.PlayerMoved(new PlayerMovedEvent { Username = request.Username });
+            await gameGroupClient.PlayerMoved(player);
 
-            var allPlayersMadeMove = game.Players.All(player => player.State != PlayerState.PlayingAnswer);
+            var haveAllPlayersMadeMove = game.Players.All(player => player.State != PlayerState.PlayingAnswer);
 
             Thread.Sleep(1000);
 
-            if (allPlayersMadeMove)
+            if (haveAllPlayersMadeMove)
             {
-                await gameGroupClient.RoundClosed(new RoundClosedEvent
-                {
-                    PlayedCardsGroupedPerPlayer = game.Players
+                var playedCardsGroupedPerPlayer = game.Players
                         .Where(player => player.State == PlayerState.AnswerPlayed)
-                        .Select(player => player.PlayedCards).ToList()
-                });
+                        .Select(player => player.PlayedCards).ToList();
+
+                await gameGroupClient.RoundClosed(playedCardsGroupedPerPlayer);
             }
 
             return Unit.Value;

@@ -2,11 +2,7 @@
 using CardsAgainstWhatever.Shared.Dtos.Actions;
 using CardsAgainstWhatever.Shared.Dtos.Events;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Controllers
@@ -24,12 +20,6 @@ namespace CardsAgainstWhatever.Server.Controllers
 
         [HttpPost]
         public Task<GameCreatedEvent> Create(CreateGameAction request)
-        {
-            return mediator.Send(new CreateGameCommand
-            {
-                QuestionCards = request.QuestionCards,
-                AnswerCards = request.AnswerCards
-            });
-        }
+            => mediator.Send(new CreateGameCommand(request.QuestionCards, request.AnswerCards));
     }
 }

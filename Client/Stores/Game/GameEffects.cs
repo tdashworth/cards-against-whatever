@@ -2,11 +2,9 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using SignalR.Strong;
+using System;
+using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Stores.Game
 {
@@ -53,7 +51,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         [EffectMethod]
         public async Task Handle(PlayAnswerAction action, IDispatcher dispatcher)
         {
-            if (Server is null) return;
+            if (Server is null || GameState.Value.SelectedCardsInHand is null) return;
 
             await Server.PlayAnswer(GameState.Value.SelectedCardsInHand);
         }
@@ -61,7 +59,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         [EffectMethod]
         public async Task Handle(PickWinnerAction action, IDispatcher dispatcher)
         {
-            if (Server is null) return;
+            if (Server is null || GameState.Value.SelectedCardsOnTable is null) return;
 
             await Server.PickWinningAnswer(GameState.Value.SelectedCardsOnTable);
         }

@@ -1,20 +1,17 @@
 ﻿using CardsAgainstWhatever.Server.Services.Interfaces;
-using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
-    public class StartRoundCommand : IRequest
-    {
-        public string GameCode { get; set; }
-    }
+    public record StartRoundCommand(
+        string GameCode)
+
+        : IRequest;
 
     class StartRoundHandler : BaseGameRequestHandler<StartRoundCommand>
     {
@@ -30,22 +27,20 @@ namespace CardsAgainstWhatever.Server.Commands
 
             await Task.WhenAll(game.Players.Select(player =>
             {
-                var playerClient = hubContextFascade.GetClient(player.ConnectionId);
+                var playerClient = hubContextFascade.GetClient(player.ConnectionId!);
                 var newCards = game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count);
                 player.CardsInHand.AddRange(newCards);
                 player.PlayedCards.Clear();
                 player.State = PlayerState.PlayingAnswer;
 
-                return playerClient.RoundStarted(new RoundStartedEvent
-                {
-                    RoundNumber = game.RoundNumber,
-                    QuestionCard = game.CurrentQuestion,
-                    CardCzar = game.CurrentCardCzar,
-                    DealtCards = newCards,
-                });
+                return playerClient.RoundStarted(
+                        currentRoundNumber: (game.RoundNumber ?? 0),
+                        currentQuestion: game.CurrentQuestion!,
+                        currentCardCzar: game.CurrentCardCzar!,
+                        dealtCards: newCards);
             }));
 
-            game.CurrentCardCzar.State = PlayerState.AwatingAnswers;
+            game.CurrentCardCzar!.State = PlayerState.AwatingAnswers;
 
             return Unit.Value;
         }

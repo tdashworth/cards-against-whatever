@@ -1,16 +1,12 @@
 ﻿using CardsAgainstWhatever.Client.Extensions;
-using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using Fluxor;
-using Microsoft.AspNetCore.SignalR.Client;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Stores.Game
 {
-    public enum GameStatus {
+    public enum GameStatus
+    {
         Lobby,
         CollectingAnswers,
         SelectingWinner,

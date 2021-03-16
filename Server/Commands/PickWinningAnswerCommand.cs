@@ -1,6 +1,4 @@
-﻿using CardsAgainstWhatever.Server.Models;
-using CardsAgainstWhatever.Server.Services.Interfaces;
-using CardsAgainstWhatever.Shared.Dtos.Events;
+﻿using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
@@ -12,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
-    public class PickWinningAnswerCommand : IRequest
-    {
-        public string GameCode { get; set; }
-        public IEnumerable<AnswerCard> SelectedWinningAnswerCards { get; set; }
-    }
+    public record PickWinningAnswerCommand(
+        string GameCode,
+        IEnumerable<AnswerCard> SelectedWinningAnswerCards)
+
+        : IRequest;
 
     class PickWinningAnswerHandler : BaseGameRequestHandler<PickWinningAnswerCommand>
     {
@@ -36,12 +34,9 @@ namespace CardsAgainstWhatever.Server.Commands
                 throw new Exception($"Winner could not be determined in game {request.GameCode}.");
             }
 
-            winner.WonCards.Add(game.CurrentQuestion);
+            winner.WonCards.Add(game.CurrentQuestion!);
 
-            await gameGroupClient.RoundEnded(new RoundEndedEvent
-            {
-                Winner = winner
-            });
+            await gameGroupClient.RoundEnded(winner);
 
             return Unit.Value;
         }

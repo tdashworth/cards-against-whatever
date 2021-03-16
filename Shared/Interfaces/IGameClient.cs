@@ -1,18 +1,29 @@
-﻿using CardsAgainstWhatever.Shared.Dtos.Events;
+﻿using CardsAgainstWhatever.Shared.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Shared.Interfaces
 {
     public interface IGameClient
     {
-        Task GameJoined(GameJoinedEvent gameJoinedEvent);
-        Task PlayerJoined(PlayerJoinedEvent playerJoinedEvent);
+        Task GameJoined(
+            List<Player> existingPlayersInGame,
+            int? currentRoundNumber,
+            QuestionCard? currentQuestion,
+            Player? currentCardCzar);
 
-        Task RoundStarted(RoundStartedEvent roundStartedEvent);
+        Task PlayerJoined(Player newPlayer);
 
-        Task PlayerMoved(PlayerMovedEvent playerMovedEvent);
+        Task RoundStarted(
+            int currentRoundNumber,
+            QuestionCard currentQuestion,
+            Player currentCardCzar,
+            List<AnswerCard> dealtCards);
 
-        Task RoundClosed(RoundClosedEvent roundClosedEvent); 
-        Task RoundEnded(RoundEndedEvent roundEndedEvent);
+        Task PlayerMoved(Player player);
+
+        Task RoundClosed(List<List<AnswerCard>> playedCardsGroupedPerPlayer);
+
+        Task RoundEnded(Player winningPlayer);
     }
 }

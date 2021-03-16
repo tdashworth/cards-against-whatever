@@ -1,17 +1,10 @@
 ﻿using CardsAgainstWhatever.Server.Commands;
-using CardsAgainstWhatever.Server.Services.Interfaces;
-using CardsAgainstWhatever.Shared;
-using CardsAgainstWhatever.Shared.Dtos;
-using CardsAgainstWhatever.Shared.Dtos.Actions;
-using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Hubs
@@ -25,40 +18,34 @@ namespace CardsAgainstWhatever.Server.Hubs
             this.mediator = mediator;
         }
 
-        private string GameCode => this.Context?.GetHttpContext()?.Request?.Query["GameCode"];
-        private string Username => this.Context?.UserIdentifier;
+        private string? GameCode => this.Context?.GetHttpContext()?.Request?.Query["GameCode"];
+        private string? Username => this.Context?.UserIdentifier;
 
         public override async Task OnConnectedAsync()
         {
-            // TODO: Validate GameCode and Username
-            
-            await mediator.Send(new JoinGameCommand
+            if (GameCode is null)
             {
-                ConnectionId = Context.ConnectionId,
-                Username = Username,
-                GameCode = GameCode
-            });
+                throw new ArgumentNullException(nameof(GameCode));
+            }
+
+            if (Username is null)
+            {
+                throw new ArgumentNullException(nameof(Username));
+            }
+
+            await mediator.Send(new JoinGameCommand(GameCode, Username, Context.ConnectionId));
 
             await base.OnConnectedAsync();
         }
 
-        public Task StartRound() => mediator.Send(new StartRoundCommand
-        {
-            GameCode = GameCode
-        });
+        public Task StartRound()
+            => mediator.Send(new StartRoundCommand(GameCode!));
 
-        public Task PlayAnswer(IEnumerable<AnswerCard> answerCards) => mediator.Send(new PlayAnswerCommand
-        {
-            GameCode = GameCode,
-            Username = Username,
-            SelectedAnswerCards = answerCards
-        });
+        public Task PlayAnswer(IEnumerable<AnswerCard> answerCards)
+            => mediator.Send(new PlayAnswerCommand(GameCode!, Username!, answerCards));
 
-        public Task PickWinningAnswer(IEnumerable<AnswerCard> answerCards) => mediator.Send(new PickWinningAnswerCommand
-        {
-            GameCode = GameCode,
-            SelectedWinningAnswerCards = answerCards
-        });
+        public Task PickWinningAnswer(IEnumerable<AnswerCard> answerCards)
+            => mediator.Send(new PickWinningAnswerCommand(GameCode!, answerCards));
 
     }
 }

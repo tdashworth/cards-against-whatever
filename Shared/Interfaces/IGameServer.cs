@@ -1,6 +1,4 @@
-﻿using CardsAgainstWhatever.Shared.Dtos.Actions;
-using CardsAgainstWhatever.Shared.Dtos.Events;
-using CardsAgainstWhatever.Shared.Models;
+﻿using CardsAgainstWhatever.Shared.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

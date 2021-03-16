@@ -1,6 +1,5 @@
 ﻿using CardsAgainstWhatever.Server.Models;
 using CardsAgainstWhatever.Server.Services.Interfaces;
-using CardsAgainstWhatever.Shared;
 using CardsAgainstWhatever.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace CardsAgainstWhatever.Server.Services
         public Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards)
         {
             var game = new ServerGame(
-                GeneratorUniqueCode(new Random(), GameStore.Keys), 
+                GeneratorUniqueCode(new Random(), GameStore.Keys),
                 new CardDeck(questionCards, answerCards));
 
             GameStore.Add(game.Code, game);

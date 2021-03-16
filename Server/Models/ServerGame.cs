@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Models
 {
@@ -12,10 +10,10 @@ namespace CardsAgainstWhatever.Server.Models
         public readonly string Code;
         public readonly CardDeck CardDeck;
         public readonly List<ServerPlayer> Players;
-        
-        public QuestionCard CurrentQuestion { get; private set; }
-        public ServerPlayer CurrentCardCzar { get; private set; }
-        public int RoundNumber { get; private set; }
+
+        public QuestionCard? CurrentQuestion { get; private set; }
+        public ServerPlayer? CurrentCardCzar { get; private set; }
+        public int? RoundNumber { get; private set; }
 
         public ServerGame(string code, CardDeck cardDeck)
         {

@@ -1,27 +1,24 @@
 ﻿using CardsAgainstWhatever.Server.Models;
 using CardsAgainstWhatever.Server.Services.Interfaces;
-using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
-    public class JoinGameCommand : IRequest
-    {
-        public string GameCode { get; set; }
-        public string Username { get; set; }
-        public string ConnectionId { get; set; }
-    }
+    public record JoinGameCommand(
+        string GameCode,
+        string Username,
+        string ConnectionId)
+
+        : IRequest;
 
     class JoinGameHandler : BaseGameRequestHandler<JoinGameCommand>
     {
-        public  JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
+        public JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
             : base(gameRepositoy, hubContextFascade) { }
 
         public async override Task<Unit> Handle(JoinGameCommand request, CancellationToken cancellationToken)
@@ -30,26 +27,17 @@ namespace CardsAgainstWhatever.Server.Commands
             var allPlayersClient = hubContextFascade.GetGroup(request.GameCode);
             var callingPlayerClient = hubContextFascade.GetClient(request.ConnectionId);
 
-            var player = new ServerPlayer
-            {
-                Username = request.Username,
-                ConnectionId = request.ConnectionId,
-                State = PlayerState.InLobby
-            };
+            var player = new ServerPlayer(request.Username, request.ConnectionId);
 
             game.Players.Add(player);
 
-            await callingPlayerClient.GameJoined(new GameJoinedEvent
-            {
-                Code = request.GameCode,
-                Username = request.Username,
-                ExistingPlayersInGame = game.Players.Cast<Player>().ToList()
-            });
+            await callingPlayerClient.GameJoined(
+                existingPlayersInGame: game.Players.Cast<Player>().ToList(),
+                currentRoundNumber: game.RoundNumber,
+                currentQuestion: game.CurrentQuestion,
+                currentCardCzar: game.CurrentCardCzar);
 
-            await allPlayersClient.PlayerJoined(new PlayerJoinedEvent
-            {
-                NewPlayer = player
-            });
+            await allPlayersClient.PlayerJoined(player);
 
             await hubContextFascade.JoinGroup(request.GameCode, request.ConnectionId);
 

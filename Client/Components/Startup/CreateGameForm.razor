@@ -78,11 +78,7 @@
     private async Task HandleValidSubmit()
     {
 
-        var response = await HttpClient.PostAsJsonAsync("api/game", new CreateGameAction
-        {
-            QuestionCards = CreateModel.Questions,
-            AnswerCards = CreateModel.Answers
-        });
+        var response = await HttpClient.PostAsJsonAsync("api/game", new CreateGameAction(CreateModel.Questions,CreateModel.Answers));
         response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadFromJsonAsync<GameCreatedEvent>();

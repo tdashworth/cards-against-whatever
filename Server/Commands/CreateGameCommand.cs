@@ -3,19 +3,17 @@ using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
-    public class CreateGameCommand : IRequest<GameCreatedEvent>
-    {
-        public List<QuestionCard> QuestionCards { get; set; }
-        public List<AnswerCard> AnswerCards { get; set; }
-    }
+    public record CreateGameCommand(
+        List<QuestionCard> QuestionCards,
+        List<AnswerCard> AnswerCards)
+
+        : IRequest<GameCreatedEvent>;
 
     class CreateGameHandler : BaseGameRequestHandler<CreateGameCommand, GameCreatedEvent>
     {
@@ -24,12 +22,9 @@ namespace CardsAgainstWhatever.Server.Commands
 
         public async override Task<GameCreatedEvent> Handle(CreateGameCommand request, CancellationToken cancellationToken)
         {
-            var gameCoee = await gameRepositoy.Create(request.QuestionCards, request.AnswerCards);
+            var gameCode = await gameRepositoy.Create(request.QuestionCards, request.AnswerCards);
 
-            return new GameCreatedEvent
-            {
-                GameCode = gameCoee
-            };
+            return new GameCreatedEvent(gameCode);
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CardsAgainstWhatever.Shared.Models
+﻿namespace CardsAgainstWhatever.Shared.Models
 {
     public enum PlayerState
     {
@@ -20,5 +14,11 @@ namespace CardsAgainstWhatever.Shared.Models
         public string Username { get; set; }
         public int Score { get; set; }
         public PlayerState State { get; set; }
+
+        public Player(string username)
+        {
+            Username = username;
+            State = PlayerState.InLobby;
+        }
     }
 }
