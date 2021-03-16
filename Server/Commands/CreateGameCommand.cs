@@ -3,9 +3,11 @@ using CardsAgainstWhatever.Shared.Dtos.Events;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using CardsAgainstWhatever.Server.Extensions;
 
 namespace CardsAgainstWhatever.Server.Commands
 {
@@ -22,7 +24,11 @@ namespace CardsAgainstWhatever.Server.Commands
 
         public async override Task<GameCreatedEvent> Handle(CreateGameCommand request, CancellationToken cancellationToken)
         {
-            var gameCode = await gameRepositoy.Create(request.QuestionCards, request.AnswerCards);
+            var random = new Random();
+
+            var gameCode = await gameRepositoy.Create(
+                request.QuestionCards.Shuffle(random), 
+                request.AnswerCards.Shuffle(random));
 
             return new GameCreatedEvent(gameCode);
         }
