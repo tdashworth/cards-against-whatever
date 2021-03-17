@@ -20,7 +20,13 @@
         <label for="card-pack-file" class="col-form-label">Card Pack</label>
         <div class="custom-file">
             <InputFile OnChange="OnCardsFileSelection" class="custom-file-input" accept=".csv" />
-            <label class="custom-file-label" for="inputGroupFile01">@(CreateModel.FileName ?? "Choose file")</label>
+            <label class="custom-file-label" for="inputGroupFile01">
+                @(CreateModel.FileName ?? "Choose file")
+                @if (IsLoading)
+                {
+                    <span class="spinner-border spinner-border-sm ml-1" role="status" aria-hidden="true"></span>
+                }
+            </label>
         </div>
         @if (CreateModel.Questions.Any() || CreateModel.Answers.Any())
         {
@@ -41,6 +47,7 @@
 
 
 @code {
+    bool IsLoading { get; set; } = false;
 
     private class CreateForm
     {
@@ -59,6 +66,8 @@
 
     async Task OnCardsFileSelection(InputFileChangeEventArgs e)
     {
+        IsLoading = true;
+
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
@@ -72,7 +81,7 @@
         {
             if (card.Type == CardType.Question)
             {
-                CreateModel.Questions.Add(new QuestionCard(card.Text, card.Pick));
+                CreateModel.Questions.Add(new QuestionCard(card.Text, card.Pick ?? 1));
             }
             if (card.Type == CardType.Answer)
             {
@@ -80,6 +89,7 @@
             }
         }
         CreateModel.FileName = e.File.Name;
+        IsLoading = false;
     }
 
     private async Task HandleValidSubmit()
@@ -94,6 +104,6 @@
     }
 
     enum CardType { Question, Answer };
-    record Card(string Text, CardType Type, int Pick);
+    record Card(string Text, CardType Type, int? Pick);
 
 }

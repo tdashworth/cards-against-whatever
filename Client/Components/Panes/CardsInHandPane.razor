@@ -18,20 +18,14 @@
         else
         {
 
-            <div class="game-card-list">
+            <div class="game-card-list h-100 d-flex align-items-center">
                 @foreach (var card in GameState.Value.CardsInHand)
                 {
-                    <article class="game-card selectable-game-card answer-card" @onclick="() => OnCardSelected(card)">
+                    <article class="game-card selectable-game-card answer-card @(IsSelected(card) ? "selected" : string.Empty)" @onclick="() => OnCardSelected(card)">
                         <div class="dummy"></div>
                         <header class="game-card-header">
-                            <h3>@card.Text</h3>
+                            <p>@card.Text</p>
                         </header>
-                        @if (GameState.Value.SelectedCardsInHand?.Contains(card) ?? false)
-                        {
-                            <div class="game-card-footer">
-                                <span>Picked</span>
-                            </div>
-                        }
                     </article>
                 }
             </div>
@@ -44,4 +38,6 @@
     public string CssStyle { get; set; } = string.Empty;
 
     void OnCardSelected(AnswerCard card) => Dispatcher.Dispatch(new AnswerSelectedAction(card));
+
+    bool IsSelected(AnswerCard card) => GameState.Value.SelectedCardsInHand?.Contains(card) ?? false;
 }

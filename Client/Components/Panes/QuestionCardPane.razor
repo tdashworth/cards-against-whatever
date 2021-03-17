@@ -2,27 +2,25 @@
 @inject IState<GameState> GameState
 
 <section class="card" style="@CssStyle">
-    <div class="card-body">
+    <div class="card-body d-flex justify-content-center align-items-center">
         @if (GameState.Value.CurrentQuestion is null)
         {
-            <div class="h-100 w-100 d-flex justify-content-center align-items-center">
-                <p>
-                    Start a round for a question card to be drawn.
-                </p>
-            </div>
+            <p>
+                Start a round for a question card to be drawn.
+            </p>
         }
         else
         {
             <article class="game-card question-card" style="width: 30%; margin: 0 auto;">
                 <div class="dummy"></div>
                 <header class="game-card-header">
-                    <h3>@GameState.Value.CurrentQuestion.Text</h3>
+                    <p>@GameState.Value.CurrentQuestion.Text.Replace("_", "____________")</p>
                 </header>
 
                 @if (GameState.Value.CurrentQuestion.Picks > 1)
                 {
                     <div class="game-card-footer">
-                        <span>Pick @GameState.Value.CurrentQuestion.Picks</span>
+                        PICK <span class="bubble">@GameState.Value.CurrentQuestion.Picks</span>
                     </div>
                 }
             </article>
