@@ -18,7 +18,7 @@
         <ul class="list-group list-group-flush" style="overflow-y: auto;">
             @foreach (var player in GameState.Value.Players)
             {
-                <li class="list-group-item">@player.Username (@player.Score)<span class="float-right">@player.State.ToString()</span></li>
+                <li class="list-group-item">@player.Username (@player.Score)<span class="float-right">@PlayerStateFormat[player.State]</span></li>
             }
             <li class="list-group-item"></li>
         </ul>
@@ -28,5 +28,15 @@
 @code {
     [Parameter]
     public string CssStyle { get; set; } = string.Empty;
+
+    Dictionary<PlayerState, string> PlayerStateFormat = new()
+    {
+        { PlayerState.AnswerPlayed, "I'm done!" },
+        { PlayerState.AwatingAnswers, "Awaiting your answers..." },
+        { PlayerState.InLobby, "Chilling in the lobby"},
+        { PlayerState.Left, "Sorry, I've left"},
+        { PlayerState.PickingWinner, "Hummm, who's is the best..."},
+        { PlayerState.PlayingAnswer, "Hummm, what do I play..."}, 
+    };
 
 }
