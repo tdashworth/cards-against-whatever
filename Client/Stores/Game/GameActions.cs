@@ -27,10 +27,13 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 IsLoading = false,
                 Status = action.gameStatus,
                 Players = action.ExistingPlayersInGame.ToList(),
-                CardsInHand = new List<AnswerCard>(),
                 CurrentRoundNumber = action.CurrentRoundNumber,
                 CurrentQuestion = action.CurrentQuestion,
-                CurrentCardCzar = action.CurrentCardCzar?.Username is not null ? state.Players.FindByUsername(action.CurrentCardCzar.Username) : null
+                CurrentCardCzar = action.CurrentCardCzar?.Username is not null ? state.Players.FindByUsername(action.CurrentCardCzar.Username) : null,
+                CardsInHand = new List<AnswerCard>(),
+                CardsOnTable = new List<List<AnswerCard>>(),
+                SelectedCardsInHand = new List<AnswerCard>(),
+                SelectedCardsOnTable = new List<AnswerCard>(),
             };
     }
 
@@ -129,14 +132,16 @@ namespace CardsAgainstWhatever.Client.Stores.Game
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, StartRoundAction action)
-            => state with { };
+            => state;
     }
 
     public record AnswerPlayedEvent(string Username)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, AnswerPlayedEvent action)
-            => state with
+            => state.Status != GameStatus.CollectingAnswers
+            ? state
+            : state with
             {
                 Players = state.Players!.CopyAndUpdate(players =>
                 {
@@ -165,7 +170,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, PickWinnerAction action)
-            => state with { };
+            => state;
     }
 
     public record RoundClosedEvent(IEnumerable<IEnumerable<AnswerCard>> PlayedCardsGroupedPerPlayer)
