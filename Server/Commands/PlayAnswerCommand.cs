@@ -39,7 +39,7 @@ namespace CardsAgainstWhatever.Server.Commands
             }
 
             player.PlayedCards = request.SelectedAnswerCards.ToList();
-            player.State = PlayerState.AnswerPlayed;
+            player.Status = PlayerStatus.AnswerPlayed;
 
             await gameGroupClient.PlayerMoved(player);
 

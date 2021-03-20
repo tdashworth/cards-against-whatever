@@ -18,13 +18,14 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record GameJoinedEvent(List<Player> ExistingPlayersInGame, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
+    public record GameJoinedEvent(GameStatus gameStatus, List<Player> ExistingPlayersInGame, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, GameJoinedEvent action)
             => state with
             {
                 IsLoading = false,
+                Status = action.gameStatus,
                 Players = action.ExistingPlayersInGame,
                 CardsInHand = new List<AnswerCard>(),
                 CurrentRoundNumber = action.CurrentRoundNumber,
@@ -55,7 +56,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             {
                 Players = state.Players!.CopyAndUpdate(players => players
                     .FindByUsername(action.Player.Username)
-                    .Update(player => player!.State = PlayerState.Left))
+                    .Update(player => player!.Status = PlayerStatus.Left))
             };
     }
 
@@ -79,16 +80,16 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 Status = GameStatus.CollectingAnswers,
                 Players = state.Players!.UpdateEach(player =>
                 {
-                    if (player.State != PlayerState.Left)
+                    if (player.Status != PlayerStatus.Left)
                     {
-                        player.State = PlayerState.PlayingAnswer;
+                        player.Status = PlayerStatus.PlayingAnswer;
                     }
                 }).ToList(),
                 CurrentRoundNumber = action.CurrentRoundNumber,
                 CurrentQuestion = action.CurrentQuestion,
                 CurrentCardCzar = state.Players
                                             .FindByUsername(action.CurrentCardCzarUsername)
-                                            .Update(player => player!.State = PlayerState.AwatingAnswers),
+                                            .Update(player => player!.Status = PlayerStatus.AwatingAnswers),
                 CardsOnTable = new List<List<AnswerCard>>(),
                 CardsInHand = state.CardsInHand!.CopyAndUpdate(cards => cards.AddRange(action.DealtCards)),
                 SelectedCardsInHand = new List<AnswerCard>(),
@@ -140,7 +141,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 Players = state.Players!.CopyAndUpdate(players =>
                 {
                     var player = players.FindByUsername(action.Username);
-                    if (player is not null) player.State = PlayerState.AnswerPlayed;
+                    if (player is not null) player.Status = PlayerStatus.AnswerPlayed;
                 }),
                 CardsOnTable = state.CardsOnTable!.CopyAndUpdate(cards =>
                 {
@@ -174,7 +175,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             => state with
             {
                 Status = GameStatus.SelectingWinner,
-                CurrentCardCzar = state.CurrentCardCzar.Update(player => player!.State = PlayerState.PickingWinner),
+                CurrentCardCzar = state.CurrentCardCzar.Update(player => player!.Status = PlayerStatus.SelectingWinner),
                 CardsOnTable = action.PlayedCardsGroupedPerPlayer
             };
     }
@@ -193,12 +194,14 @@ namespace CardsAgainstWhatever.Client.Stores.Game
 
                     foreach (var player in players)
                     {
-                        if (player.State != PlayerState.Left)
+                        if (player.Status != PlayerStatus.Left)
                         {
-                            player.State = PlayerState.InLobby;
+                            player.Status = PlayerStatus.Lobby;
                         }
                     }
                 }),
+                SelectedCardsInHand = new List<AnswerCard>(),
+                SelectedCardsOnTable = new List<AnswerCard>(),
             };
     }
 }

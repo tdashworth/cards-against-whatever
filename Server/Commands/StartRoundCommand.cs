@@ -1,4 +1,5 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Extensions;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
@@ -21,25 +22,29 @@ namespace CardsAgainstWhatever.Server.Commands
         public async override Task<Unit> Handle(StartRoundCommand request, CancellationToken cancellationToken)
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
+            game.Status = GameStatus.CollectingAnswers;
             game.IncrementRoundNumber();
             game.SelectNextCardCzar();
             game.SelectNextQuestion();
 
-            await Task.WhenAll(game.Players.Where(player => player.State != PlayerState.Left).Select(player =>
-            {
-                var playerClient = hubContextFascade.GetClient(player.ConnectionId!);
-                var newCards = game.CardDeck.PickUpAnswers(5 - player.CardsInHand.Count);
-                player.CardsInHand.AddRange(newCards);
-                player.State = PlayerState.PlayingAnswer;
+            await game.Players
+                .Where(player => player.Status != PlayerStatus.Left)
+                .Select(player =>
+                {
+                    var playerClient = hubContextFascade.GetClient(player.ConnectionId!);
+                    var newCards = game.CardDeck.PickUpAnswers(10 - player.CardsInHand.Count);
+                    player.CardsInHand.AddRange(newCards);
+                    player.Status = PlayerStatus.PlayingAnswer;
 
-                return playerClient.RoundStarted(
-                        currentRoundNumber: (game.RoundNumber ?? 0),
-                        currentQuestion: game.CurrentQuestion!,
-                        currentCardCzar: game.CurrentCardCzar!,
-                        dealtCards: newCards);
-            }));
+                    return playerClient.RoundStarted(
+                            currentRoundNumber: (game.RoundNumber ?? 0),
+                            currentQuestion: game.CurrentQuestion!,
+                            currentCardCzar: game.CurrentCardCzar!,
+                            dealtCards: newCards);
+                })
+                .AwaitAll();
 
-            game.CurrentCardCzar!.State = PlayerState.AwatingAnswers;
+            game.CurrentCardCzar!.Status = PlayerStatus.AwatingAnswers;
 
             return Unit.Value;
         }

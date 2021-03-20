@@ -38,7 +38,7 @@ namespace CardsAgainstWhatever.Server.Commands
                 throw new Exception($"Player {request.Username} could not be found in game {request.GameCode}");
             }
 
-            player.State = PlayerState.Left;
+            player.Status = PlayerStatus.Left;
 
             if (!string.IsNullOrEmpty(player.ConnectionId))
             {

@@ -16,8 +16,8 @@ namespace CardsAgainstWhatever.Client.Services
             this.dispatcher = dispatcher;
         }
 
-        public Task GameJoined(List<Player> existingPlayersInGame, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
-            => Task.Run(() => dispatcher.Dispatch(new GameJoinedEvent(existingPlayersInGame, currentRoundNumber, currentQuestion, currentCardCzar)));
+        public Task GameJoined(GameStatus gameStatus, List<Player> existingPlayersInGame, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
+            => Task.Run(() => dispatcher.Dispatch(new GameJoinedEvent(gameStatus, existingPlayersInGame, currentRoundNumber, currentQuestion, currentCardCzar)));
 
         public Task PlayerJoined(Player newPlayer)
             => Task.Run(() => dispatcher.Dispatch(new PlayerJoinedEvent(newPlayer)));

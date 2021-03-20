@@ -10,6 +10,7 @@ namespace CardsAgainstWhatever.Server.Models
         public readonly CardDeck CardDeck;
         public readonly List<ServerPlayer> Players;
 
+        public GameStatus Status { get; set; }
         public QuestionCard? CurrentQuestion { get; private set; }
         public ServerPlayer? CurrentCardCzar { get; private set; }
         public int? RoundNumber { get; private set; }
@@ -19,6 +20,7 @@ namespace CardsAgainstWhatever.Server.Models
             Code = code;
             CardDeck = cardDeck;
             Players = new();
+            Status = GameStatus.Lobby;
         }
 
         public void IncrementRoundNumber() => RoundNumber++;
@@ -34,7 +36,7 @@ namespace CardsAgainstWhatever.Server.Models
                 ? 0
                 : (Players.FindIndex(player => player == CurrentCardCzar) + 1) % Players.Count;
 
-            while (Players[nextPlayerIndex].State == PlayerState.Left)
+            while (Players[nextPlayerIndex].Status == PlayerStatus.Left)
             {
                 nextPlayerIndex = (nextPlayerIndex + 1) % Players.Count;
             }

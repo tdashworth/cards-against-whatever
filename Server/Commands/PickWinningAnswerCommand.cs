@@ -39,12 +39,13 @@ namespace CardsAgainstWhatever.Server.Commands
 
             foreach (var player in game.Players)
             {
-                if (player.State != PlayerState.Left)
+                if (player.Status != PlayerStatus.Left)
                 {
-                    player.State = PlayerState.InLobby;
+                    player.Status = PlayerStatus.Lobby;
                 }
                 player.PlayedCards.Clear();
             }
+            game.Status = GameStatus.Lobby;
 
             await gameGroupClient.RoundEnded((Player)winner);
 

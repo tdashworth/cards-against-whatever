@@ -1,34 +1,24 @@
 ﻿@inherits FluxorComponent
 @inject IState<GameState> GameState
 
-@Button
-
-@code {
-
-    RenderFragment Button => (GameState.Value.Status, GameState.Value.Me?.State) switch
-    {
-        (GameStatus.Lobby, _) => __builder =>
-        {
-        <StartRoundButton />
-        }
-        ,
-        (GameStatus.CollectingAnswers, PlayerState.PlayingAnswer) => __builder =>
-        {
-        <PlayAnswerButton />
-        }
-        ,
-        (GameStatus.CollectingAnswers, _) => __builder =>
-        { <p class="my-2 w-100 text-center">Please wait for everyone to play their answer.</p> }
-        ,
-        (GameStatus.SelectingWinner, PlayerState.PickingWinner) => __builder =>
-        {
-        <ConfirmWinnerButton />
-        }
-        ,
-        (GameStatus.SelectingWinner, _) => __builder =>
-        { <p class="my-2 w-100 text-center">Please wait for the CardCzar to pick the winner.</p>}
-        ,
-        (_, _) => __builder => { <p>:(</p>}
-    };
-
+@if (GameState.Value.Status == GameStatus.Lobby)
+{
+    <StartRoundButton />
 }
+else if (GameState.Value.Status == GameStatus.CollectingAnswers && GameState.Value.Me?.Status == PlayerStatus.PlayingAnswer)
+{
+    <PlayAnswerButton />
+}
+else if (GameState.Value.Status == GameStatus.CollectingAnswers)
+{
+    <p class="my-2 w-100 text-center">Please wait for everyone to play their answer.</p>
+}
+else if (GameState.Value.Status == GameStatus.SelectingWinner && GameState.Value.Me?.Status == PlayerStatus.SelectingWinner)
+{
+    <ConfirmWinnerButton />
+}
+else if (GameState.Value.Status == GameStatus.SelectingWinner)
+{
+    <p class="my-2 w-100 text-center">Please wait for the CardCzar to pick the winner.</p>
+}
+

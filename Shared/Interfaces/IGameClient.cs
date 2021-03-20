@@ -7,6 +7,7 @@ namespace CardsAgainstWhatever.Shared.Interfaces
     public interface IGameClient
     {
         Task GameJoined(
+            GameStatus gameStatus,
             List<Player> existingPlayersInGame,
             int? currentRoundNumber,
             QuestionCard? currentQuestion,

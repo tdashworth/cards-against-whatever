@@ -9,7 +9,7 @@
 
     <PlayersListPane CssStyle="grid-column: 3 / 4; grid-row: 1;" />
 
-    @if (GameState.Value.Me?.State == PlayerState.PlayingAnswer)
+    @if (GameState.Value.Me?.Status == PlayerStatus.PlayingAnswer)
     {
         <CardsInHandPane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
     }

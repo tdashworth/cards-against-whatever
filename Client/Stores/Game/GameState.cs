@@ -5,13 +5,6 @@ using System.Collections.Generic;
 
 namespace CardsAgainstWhatever.Client.Stores.Game
 {
-    public enum GameStatus
-    {
-        Lobby,
-        CollectingAnswers,
-        SelectingWinner,
-    }
-
     public record GameState(
         bool IsLoading,
         string? CurrentErrorMessage,

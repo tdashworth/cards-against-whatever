@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Extensions
 {
@@ -16,5 +17,11 @@ namespace CardsAgainstWhatever.Server.Extensions
             }
             return randomizedList;
         }
+
+        public static Task<T[]> AwaitAll<T>(this IEnumerable<Task<T>> list)
+            => Task.WhenAll(list);
+
+        public static Task AwaitAll(this IEnumerable<Task> list)
+            => Task.WhenAll(list);
     }
 }

@@ -42,11 +42,12 @@ namespace CardsAgainstWhatever.Server.Commands
             }
             else
             {
-                player.State = PlayerState.InLobby;
+                player.Status = PlayerStatus.Lobby;
                 player.ConnectionId = request.ConnectionId;
             }
 
             await callingPlayerClient.GameJoined(
+                gameStatus: game.Status,
                 existingPlayersInGame: game.Players.Cast<Player>().ToList(),
                 currentRoundNumber: game.RoundNumber,
                 currentQuestion: game.CurrentQuestion,

@@ -23,17 +23,27 @@ namespace CardsAgainstWhatever.Server.Commands
             var game = await gameRepositoy.GetByCode(request.GameCode);
             var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
 
-            var haveAllPlayersMadeMove = game.Players.All(player => player.State != PlayerState.PlayingAnswer);
-
-            if (haveAllPlayersMadeMove)
+            if (game.Status != GameStatus.CollectingAnswers)
             {
-                Thread.Sleep(1000);
-                var playedCardsGroupedPerPlayer = game.Players
-                        .Where(player => player.PlayedCards.Any())
-                        .Select(player => player.PlayedCards).ToList();
-
-                await gameGroupClient.RoundClosed(playedCardsGroupedPerPlayer);
+                return Unit.Value;
             }
+
+            var haveAllPlayersMadeMove = game.Players.All(player => player.Status != PlayerStatus.PlayingAnswer);
+
+            if (!haveAllPlayersMadeMove)
+            {
+                return Unit.Value;
+            }
+
+            Thread.Sleep(100);
+            game.Status = GameStatus.SelectingWinner;
+
+            var playedCardsGroupedPerPlayer = game.Players
+                    .Where(player => player.PlayedCards.Any())
+                    .Select(player => player.PlayedCards)
+                    .ToList();
+
+            await gameGroupClient.RoundClosed(playedCardsGroupedPerPlayer);
 
             return Unit.Value;
         }
