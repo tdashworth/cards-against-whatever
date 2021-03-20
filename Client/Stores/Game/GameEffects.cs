@@ -14,6 +14,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         private readonly IServiceProvider ServiceProvider;
         private readonly IState<GameState> GameState;
 
+        private HubConnection? HubConnection;
         private IGameServer? Server;
 
         public GameEffects(NavigationManager navigationManager, IServiceProvider serviceProvider, IState<GameState> gameState)
@@ -26,7 +27,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         [EffectMethod]
         public async Task Handle(JoinGameAction action, IDispatcher dispatcher)
         {
-            var connection = new HubConnectionBuilder()
+            HubConnection = new HubConnectionBuilder()
                 .WithUrl(
                     NavigationManager.ToAbsoluteUri($"/gamehub?GameCode={action.GameCode}&Username={action.Username}")
                 )
@@ -34,10 +35,10 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 .Build();
 
             var gameClient = ServiceProvider.GetService(typeof(IGameClient));
-            connection.RegisterSpoke<IGameClient>(gameClient);
-            Server = connection.AsGeneratedHub<IGameServer>();
+            HubConnection.RegisterSpoke<IGameClient>(gameClient);
+            Server = HubConnection.AsGeneratedHub<IGameServer>();
 
-            await connection.StartAsync();
+            await HubConnection.StartAsync();
         }
 
         [EffectMethod]
@@ -62,6 +63,18 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             if (Server is null || GameState.Value.SelectedCardsOnTable is null) return;
 
             await Server.PickWinningAnswer(GameState.Value.SelectedCardsOnTable);
+        }
+
+        [EffectMethod]
+        public async Task Handle(LeaveGameAction action, IDispatcher dispatcher)
+        {
+            if (HubConnection is not null)
+            {
+                await HubConnection.StopAsync();
+            }
+
+            HubConnection = null;
+            Server = null;
         }
     }
 }

@@ -209,4 +209,15 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 SelectedCardsOnTable = new List<AnswerCard>(),
             };
     }
+
+    public record LeaveGameAction()
+    {
+        [ReducerMethod]
+        public static GameState Reduce(GameState state, LeaveGameAction action)
+            => state with
+            {
+                GameCode = null,
+                Username = null
+            };
+    }
 }
