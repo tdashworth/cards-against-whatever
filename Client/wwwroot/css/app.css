@@ -156,3 +156,12 @@ a,
     background: black;
     border: 1px solid black;
 }
+
+.toasts {
+    position: absolute; 
+    bottom: 0; 
+    right: 0;
+    margin-bottom: 2em;
+    margin-right: 2em;
+    min-width: 300px;
+}

@@ -1,4 +1,5 @@
 ﻿@using CardsAgainstWhatever.Client.Components.Panes
+@using CardsAgainstWhatever.Client.Components
 @inherits FluxorComponent
 @inject IState<GameState> GameState
 
@@ -18,6 +19,8 @@
         <CardsOnTablePane CssStyle="grid-column: 1 / 4; grid-row: 2;" />
     }
 </div>
+
+<Toasts />
 
 @code {
 
