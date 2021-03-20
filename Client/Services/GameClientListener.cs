@@ -16,7 +16,7 @@ namespace CardsAgainstWhatever.Client.Services
             this.dispatcher = dispatcher;
         }
 
-        public Task GameJoined(GameStatus gameStatus, List<Player> existingPlayersInGame, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
+        public Task GameJoined(GameStatus gameStatus, IEnumerable<Player> existingPlayersInGame, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
             => Task.Run(() => dispatcher.Dispatch(new GameJoinedEvent(gameStatus, existingPlayersInGame, currentRoundNumber, currentQuestion, currentCardCzar)));
 
         public Task PlayerJoined(Player newPlayer)
@@ -25,13 +25,13 @@ namespace CardsAgainstWhatever.Client.Services
         public Task PlayerLeft(Player newPlayer)
             => Task.Run(() => dispatcher.Dispatch(new PlayerLeftEvent(newPlayer)));
 
-        public Task RoundStarted(int currentRoundNumber, QuestionCard currentQuestion, Player currentCardCzar, List<AnswerCard> dealtCards)
+        public Task RoundStarted(int currentRoundNumber, QuestionCard currentQuestion, Player currentCardCzar, IEnumerable<AnswerCard> dealtCards)
             => Task.Run(() => dispatcher.Dispatch(new RoundStartedEvent(currentRoundNumber, currentQuestion, currentCardCzar.Username, dealtCards)));
 
         public Task PlayerMoved(Player player)
             => Task.Run(() => dispatcher.Dispatch(new AnswerPlayedEvent(player.Username)));
 
-        public Task RoundClosed(List<List<AnswerCard>> playedCardsGroupedPerPlayer)
+        public Task RoundClosed(IEnumerable<IEnumerable<AnswerCard>> playedCardsGroupedPerPlayer)
             => Task.Run(() => dispatcher.Dispatch(new RoundClosedEvent(playedCardsGroupedPerPlayer)));
 
         public Task RoundEnded(Player winningPlayer)

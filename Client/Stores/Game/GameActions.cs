@@ -18,7 +18,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record GameJoinedEvent(GameStatus gameStatus, List<Player> ExistingPlayersInGame, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
+    public record GameJoinedEvent(GameStatus gameStatus, IEnumerable<Player> ExistingPlayersInGame, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, GameJoinedEvent action)
@@ -26,7 +26,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             {
                 IsLoading = false,
                 Status = action.gameStatus,
-                Players = action.ExistingPlayersInGame,
+                Players = action.ExistingPlayersInGame.ToList(),
                 CardsInHand = new List<AnswerCard>(),
                 CurrentRoundNumber = action.CurrentRoundNumber,
                 CurrentQuestion = action.CurrentQuestion,
@@ -70,7 +70,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record RoundStartedEvent(int CurrentRoundNumber, QuestionCard CurrentQuestion, string CurrentCardCzarUsername, List<AnswerCard> DealtCards)
+    public record RoundStartedEvent(int CurrentRoundNumber, QuestionCard CurrentQuestion, string CurrentCardCzarUsername, IEnumerable<AnswerCard> DealtCards)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, RoundStartedEvent action)
@@ -168,7 +168,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             => state with { };
     }
 
-    public record RoundClosedEvent(List<List<AnswerCard>> PlayedCardsGroupedPerPlayer)
+    public record RoundClosedEvent(IEnumerable<IEnumerable<AnswerCard>> PlayedCardsGroupedPerPlayer)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, RoundClosedEvent action)
@@ -176,7 +176,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             {
                 Status = GameStatus.SelectingWinner,
                 CurrentCardCzar = state.CurrentCardCzar.Update(player => player!.Status = PlayerStatus.SelectingWinner),
-                CardsOnTable = action.PlayedCardsGroupedPerPlayer
+                CardsOnTable = action.PlayedCardsGroupedPerPlayer.Select(x => x.ToList()).ToList()
             };
     }
 

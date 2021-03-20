@@ -8,7 +8,7 @@ namespace CardsAgainstWhatever.Shared.Interfaces
     {
         Task GameJoined(
             GameStatus gameStatus,
-            List<Player> existingPlayersInGame,
+            IEnumerable<Player> existingPlayersInGame,
             int? currentRoundNumber,
             QuestionCard? currentQuestion,
             Player? currentCardCzar);
@@ -21,11 +21,11 @@ namespace CardsAgainstWhatever.Shared.Interfaces
             int currentRoundNumber,
             QuestionCard currentQuestion,
             Player currentCardCzar,
-            List<AnswerCard> dealtCards);
+            IEnumerable<AnswerCard> dealtCards);
 
         Task PlayerMoved(Player player);
 
-        Task RoundClosed(List<List<AnswerCard>> playedCardsGroupedPerPlayer);
+        Task RoundClosed(IEnumerable<IEnumerable<AnswerCard>> playedCardsGroupedPerPlayer);
 
         Task RoundEnded(Player winningPlayer);
     }

@@ -1,7 +1,9 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Extensions;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +43,8 @@ namespace CardsAgainstWhatever.Server.Commands
             var playedCardsGroupedPerPlayer = game.Players
                     .Where(player => player.PlayedCards.Any())
                     .Select(player => player.PlayedCards)
-                    .ToList();
+                    .ToList()
+                    .Shuffle(new Random());
 
             await gameGroupClient.RoundClosed(playedCardsGroupedPerPlayer);
 
