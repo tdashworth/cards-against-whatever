@@ -2,6 +2,7 @@
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,20 +22,28 @@ namespace CardsAgainstWhatever.Server.Commands
     {
         private readonly IMediator mediator;
 
-        public PlayAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, IMediator mediator)
-            : base(gameRepositoy, hubContextFascade)
+        public PlayAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<PlayAnswerCommand>> logger, IMediator mediator)
+            : base(gameRepositoy, hubContextFascade, logger)
         {
             this.mediator = mediator;
         }
 
-        public async override Task<Unit> Handle(PlayAnswerCommand request, CancellationToken cancellationToken)
+        public async override Task HandleVoid(PlayAnswerCommand request, CancellationToken cancellationToken)
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
-            var player = game.Players.FirstOrDefault(player => player.Username == request.Username);
             var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
+
+            if (game.Status == GameStatus.CollectingAnswers)
+            {
+                logger.LogWarning($"Invalid action. You can only play answers when the game status is {GameStatus.CollectingAnswers}.");
+                throw new Exception($"Invalid action. You can only play answers when the game status is {GameStatus.CollectingAnswers}.");
+            }
+
+            var player = game.Players.FirstOrDefault(player => player.Username == request.Username);
 
             if (player == null)
             {
+                logger.LogError($"Player {request.Username} not found in game {request.GameCode}.");
                 throw new Exception($"Player {request.Username} not found in game {request.GameCode}.");
             }
 
@@ -44,8 +53,6 @@ namespace CardsAgainstWhatever.Server.Commands
             await gameGroupClient.PlayerMoved(player);
 
             await mediator.Send(new CloseRoundCommand(request.GameCode));
-
-            return Unit.Value;
         }
     }
 }

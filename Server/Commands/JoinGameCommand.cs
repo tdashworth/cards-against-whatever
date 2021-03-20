@@ -3,6 +3,7 @@ using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -19,10 +20,10 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class JoinGameHandler : BaseGameRequestHandler<JoinGameCommand>
     {
-        public JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
-            : base(gameRepositoy, hubContextFascade) { }
+        public JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<JoinGameCommand>>    logger)
+            : base(gameRepositoy, hubContextFascade, logger) { }
 
-        public async override Task<Unit> Handle(JoinGameCommand request, CancellationToken cancellationToken)
+        public async override Task HandleVoid(JoinGameCommand request, CancellationToken cancellationToken)
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
             var allPlayersClient = hubContextFascade.GetGroup(request.GameCode);
@@ -32,7 +33,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             if (player is not null && player.ConnectionId is not null)
             {
-                throw new Exception("Username taken.");
+                throw new ArgumentException(nameof(request.Username), $"Username {request.Username} has been taken in the game {request.GameCode}.");
             }
 
             if (player is null)
@@ -56,8 +57,6 @@ namespace CardsAgainstWhatever.Server.Commands
             await allPlayersClient.PlayerJoined((Player)player);
 
             await hubContextFascade.JoinGroup(request.GameCode, request.ConnectionId);
-
-            return Unit.Value;
         }
     }
 }

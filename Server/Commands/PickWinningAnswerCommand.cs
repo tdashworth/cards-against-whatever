@@ -1,7 +1,9 @@
-﻿using CardsAgainstWhatever.Server.Services.Interfaces;
+﻿using CardsAgainstWhatever.Server.Models;
+using CardsAgainstWhatever.Server.Services.Interfaces;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,16 +20,21 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class PickWinningAnswerHandler : BaseGameRequestHandler<PickWinningAnswerCommand>
     {
-        public PickWinningAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade)
-            : base(gameRepositoy, hubContextFascade) { }
+        public PickWinningAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<PickWinningAnswerCommand>> logger)
+            : base(gameRepositoy, hubContextFascade, logger) { }
 
-        public async override Task<Unit> Handle(PickWinningAnswerCommand request, CancellationToken cancellationToken)
+        public async override Task HandleVoid(PickWinningAnswerCommand request, CancellationToken cancellationToken)
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
             var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
-            var winner = game.Players
-                .Where(player => player != game.CurrentCardCzar)
-                .FirstOrDefault(player => player.PlayedCards.All(card => request.SelectedWinningAnswerCards.Contains(card)));
+
+            if (game.Status != GameStatus.SelectingWinner)
+            {
+                logger.LogWarning($"Invalid action. You can only select a winner when the game status is {GameStatus.SelectingWinner}.");
+                throw new Exception($"Invalid action. You can only select a winner when the game status is {GameStatus.SelectingWinner}.");
+            }
+
+            var winner = DetermineWinnerFromPlayedCards(game.Players, request.SelectedWinningAnswerCards);
 
             if (winner == null)
             {
@@ -37,7 +44,16 @@ namespace CardsAgainstWhatever.Server.Commands
             winner.WonCards.Add(game.CurrentQuestion!);
             winner.Score++;
 
-            foreach (var player in game.Players)
+            ResetPlayers(game.Players);
+
+            game.Status = GameStatus.Lobby;
+
+            await gameGroupClient.RoundEnded((Player)winner);
+        }
+
+        private static void ResetPlayers(IEnumerable<ServerPlayer> players)
+        {
+            foreach (var player in players)
             {
                 if (player.Status != PlayerStatus.Left)
                 {
@@ -45,11 +61,11 @@ namespace CardsAgainstWhatever.Server.Commands
                 }
                 player.PlayedCards.Clear();
             }
-            game.Status = GameStatus.Lobby;
+        }
 
-            await gameGroupClient.RoundEnded((Player)winner);
-
-            return Unit.Value;
+        private static ServerPlayer? DetermineWinnerFromPlayedCards(IEnumerable<ServerPlayer> players, IEnumerable<AnswerCard> winningCards)
+        {
+            return players.FirstOrDefault(player => winningCards.All(card => player.PlayedCards.Contains(card)));
         }
     }
 }

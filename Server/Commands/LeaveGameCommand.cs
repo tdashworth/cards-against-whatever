@@ -2,6 +2,7 @@
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -20,13 +21,13 @@ namespace CardsAgainstWhatever.Server.Commands
     {
         private readonly IMediator mediator;
 
-        public LeaveGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, IMediator mediator)
-            : base(gameRepositoy, hubContextFascade)
+        public LeaveGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<LeaveGameCommand>> logger, IMediator mediator)
+            : base(gameRepositoy, hubContextFascade, logger)
         {
             this.mediator = mediator;
         }
 
-        public async override Task<Unit> Handle(LeaveGameCommand request, CancellationToken cancellationToken)
+        public async override Task HandleVoid(LeaveGameCommand request, CancellationToken cancellationToken)
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
             var allPlayersClient = hubContextFascade.GetGroup(request.GameCode);
@@ -49,8 +50,6 @@ namespace CardsAgainstWhatever.Server.Commands
             await allPlayersClient.PlayerLeft((Player)player);
 
             await mediator.Send(new CloseRoundCommand(request.GameCode));
-
-            return Unit.Value;
         }
     }
 }
