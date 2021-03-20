@@ -23,7 +23,15 @@ namespace CardsAgainstWhatever.Server.Models
             Status = GameStatus.Lobby;
         }
 
-        public void IncrementRoundNumber() => RoundNumber++;
+        public void IncrementRoundNumber()
+        {
+            if (RoundNumber is null)
+            {
+                RoundNumber = 0;
+            } 
+            
+            RoundNumber++;
+        }
 
         public void SelectNextCardCzar()
         {
