@@ -1,4 +1,5 @@
-﻿using CardsAgainstWhatever.Shared.Interfaces;
+﻿using CardsAgainstWhatever.Client.Stores.Server;
+using CardsAgainstWhatever.Shared.Interfaces;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -10,71 +11,55 @@ namespace CardsAgainstWhatever.Client.Stores.Game
 {
     public class GameEffects
     {
-        private readonly NavigationManager NavigationManager;
-        private readonly IServiceProvider ServiceProvider;
+        private readonly IState<ServerState> ServerState;
         private readonly IState<GameState> GameState;
 
-        private HubConnection? HubConnection;
-        private IGameServer? Server;
-
-        public GameEffects(NavigationManager navigationManager, IServiceProvider serviceProvider, IState<GameState> gameState)
+        public GameEffects(IState<ServerState> serverState, IState<GameState> gameState)
         {
-            NavigationManager = navigationManager;
-            ServiceProvider = serviceProvider;
+            ServerState = serverState;
             GameState = gameState;
         }
 
         [EffectMethod]
         public async Task Handle(JoinGameAction action, IDispatcher dispatcher)
         {
-            HubConnection = new HubConnectionBuilder()
-                .WithUrl(
-                    NavigationManager.ToAbsoluteUri($"/gamehub?GameCode={action.GameCode}&Username={action.Username}")
-                )
-                .WithAutomaticReconnect()
-                .Build();
+            if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
 
-            var gameClient = ServiceProvider.GetService(typeof(IGameClient));
-            HubConnection.RegisterSpoke<IGameClient>(gameClient);
-            Server = HubConnection.AsGeneratedHub<IGameServer>();
-
-            await HubConnection.StartAsync();
+            await ServerState.Value.GameServer.JoinGame(action.GameCode, action.Username);
         }
 
         [EffectMethod]
         public async Task Handle(StartRoundAction action, IDispatcher dispatcher)
         {
-            if (Server is null) return;
+            if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
 
-            await Server.StartRound();
+            await ServerState.Value.GameServer.StartRound();
         }
 
         [EffectMethod]
         public async Task Handle(PlayAnswerAction action, IDispatcher dispatcher)
         {
-            if (Server is null || GameState.Value.SelectedCardsInHand is null) return;
+            if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
+            if (GameState.Value.SelectedCardsInHand is null) return;
 
-            await Server.PlayAnswer(GameState.Value.SelectedCardsInHand);
+            await ServerState.Value.GameServer.PlayAnswer(GameState.Value.SelectedCardsInHand);
         }
 
         [EffectMethod]
         public async Task Handle(PickWinnerAction action, IDispatcher dispatcher)
         {
-            if (Server is null || GameState.Value.SelectedCardsOnTable is null) return;
+            if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
+            if (GameState.Value.SelectedCardsOnTable is null) return;
 
-            await Server.PickWinningAnswer(GameState.Value.SelectedCardsOnTable);
+            await ServerState.Value.GameServer.PickWinningAnswer(GameState.Value.SelectedCardsOnTable);
         }
 
         [EffectMethod]
         public async Task Handle(LeaveGameAction action, IDispatcher dispatcher)
         {
-            if (HubConnection is not null)
-            {
-                await HubConnection.StopAsync();
-            }
+            if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
 
-            HubConnection = null;
-            Server = null;
+            await ServerState.Value.GameServer.LeaveGame();
         }
     }
 }

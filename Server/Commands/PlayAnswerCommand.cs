@@ -33,7 +33,7 @@ namespace CardsAgainstWhatever.Server.Commands
             var game = await gameRepositoy.GetByCode(request.GameCode);
             var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
 
-            if (game.Status == GameStatus.CollectingAnswers)
+            if (game.Status != GameStatus.CollectingAnswers)
             {
                 logger.LogWarning($"Invalid action. You can only play answers when the game status is {GameStatus.CollectingAnswers}.");
                 throw new Exception($"Invalid action. You can only play answers when the game status is {GameStatus.CollectingAnswers}.");

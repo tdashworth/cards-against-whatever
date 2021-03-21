@@ -32,7 +32,7 @@ namespace CardsAgainstWhatever.Server
 
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
-            services.AddSingleton<IUserIdProvider, QueryStringUserIdProvider>();
+            services.AddSingleton<IConnectionUserMapping, ConnectionUserMapping>();
             services.AddScoped<IGameRepositoy, GameRepository>();
             services.AddScoped<IHubContextFascade<IGameClient>, HubContextFascade<GameHub, IGameClient>>();
         }

@@ -26,7 +26,7 @@ namespace CardsAgainstWhatever.Server.Commands
         {
             var game = await gameRepositoy.GetByCode(request.GameCode);
 
-            if (game.Status != GameStatus.SelectingWinner)
+            if (game.Status != GameStatus.Lobby)
             {
                 logger.LogWarning($"Invalid action. You can only start a game when the game status is {GameStatus.Lobby}.");
                 throw new Exception($"Invalid action. You can only start a game when the game status is {GameStatus.Lobby}.");
