@@ -96,7 +96,12 @@
     {
 
         var response = await HttpClient.PostAsJsonAsync("api/game", new CreateGameAction(CreateModel.Questions, CreateModel.Answers));
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Dispatcher.Dispatch(new GameJoinedFailedEvent("Failed to create a new game."));
+            return;
+        }
 
         var content = await response.Content.ReadFromJsonAsync<GameCreatedEvent>();
 

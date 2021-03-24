@@ -28,8 +28,11 @@ namespace CardsAgainstWhatever.Server.Commands
         protected BaseGameRequestHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<TRequest>> logger)
             : base(gameRepositoy, hubContextFascade, logger) { }
 
-        public override Task<Unit> Handle(TRequest request, CancellationToken cancellationToken)
-            => HandleVoid(request, cancellationToken).ContinueWith(_ => Unit.Value);
+        public async override Task<Unit> Handle(TRequest request, CancellationToken cancellationToken)
+        {
+            await HandleVoid(request, cancellationToken);
+            return Unit.Value;
+        }
 
         public abstract Task HandleVoid(TRequest request, CancellationToken cancellationToken);
     }

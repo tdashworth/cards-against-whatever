@@ -1,4 +1,6 @@
-﻿using CardsAgainstWhatever.Shared.Models;
+﻿using CardsAgainstWhatever.Shared.Dtos;
+using CardsAgainstWhatever.Shared.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,10 +8,10 @@ namespace CardsAgainstWhatever.Shared.Interfaces
 {
     public interface IGameServer
     {
-        Task JoinGame(string gameCode, string username);
-        Task StartRound();
-        Task PlayAnswer(IEnumerable<AnswerCard> answerCards);
-        Task PickWinningAnswer(IEnumerable<AnswerCard> answerCards);
-        Task LeaveGame();
+        Task<Response> JoinGame(string gameCode, string username);
+        Task<Response> StartRound();
+        Task<Response> PlayAnswer(IEnumerable<AnswerCard> answerCards);
+        Task<Response> PickWinningAnswer(IEnumerable<AnswerCard> answerCards);
+        Task<Response> LeaveGame();
     }
 }

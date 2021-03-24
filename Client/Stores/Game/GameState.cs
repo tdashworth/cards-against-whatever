@@ -10,7 +10,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         string? CurrentErrorMessage,
         string? GameCode,
         string? Username,
-        GameStatus Status,
+        GameStatus? Status,
         IReadOnlyList<Player>? Players,
         int? CurrentRoundNumber,
         QuestionCard? CurrentQuestion,
@@ -28,6 +28,6 @@ namespace CardsAgainstWhatever.Client.Stores.Game
     {
         public override string GetName() => "Game";
 
-        protected override GameState GetInitialState() => new GameState(false, null, null, null, GameStatus.Lobby, null, null, null, null, null, null, null, null);
+        protected override GameState GetInitialState() => new GameState(false, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }

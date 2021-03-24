@@ -1,4 +1,5 @@
-﻿using CardsAgainstWhatever.Shared.Interfaces;
+﻿using CardsAgainstWhatever.Client.Services;
+using CardsAgainstWhatever.Shared.Interfaces;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -29,10 +30,12 @@ namespace CardsAgainstWhatever.Client.Stores.Server
                 .WithAutomaticReconnect()
                 .Build();
 
-            var gameClient = ServiceProvider.GetService(typeof(IGameClient));
+            //var server = new GameServerProxy(connection);
             var server = connection.AsGeneratedHub<IGameServer>();
 
+            var gameClient = ServiceProvider.GetService(typeof(IGameClient));
             connection.RegisterSpoke<IGameClient>(gameClient);
+
             connection.Closed += (Exception ex) => Task.Run(() => dispatcher.Dispatch(new DisconnectedEvent()));
             connection.Reconnected += (string id) => Task.Run(() => dispatcher.Dispatch(new ReconnectedEvent()));
             connection.Reconnecting += (Exception ex) => Task.Run(() => dispatcher.Dispatch(new ReconnectingEvent()));

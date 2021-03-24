@@ -25,7 +25,12 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         {
             if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
 
-            await ServerState.Value.GameServer.JoinGame(action.GameCode, action.Username);
+            var response = await ServerState.Value.GameServer.JoinGame(action.GameCode, action.Username);
+
+            if (response is not null && response.ErrorMessage is not null)
+            {
+                dispatcher.Dispatch(new GameJoinedFailedEvent(response.ErrorMessage));
+            }
         }
 
         [EffectMethod]

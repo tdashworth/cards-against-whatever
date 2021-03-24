@@ -33,7 +33,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             if (player is not null && player.ConnectionId is not null)
             {
-                throw new ArgumentException(nameof(request.Username), $"Username {request.Username} has been taken in the game {request.GameCode}.");
+                throw new Exception($"Username {request.Username} has been taken in the game {request.GameCode}.");
             }
 
             if (player is null)

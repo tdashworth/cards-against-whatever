@@ -13,6 +13,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             => state with
             {
                 IsLoading = true,
+                CurrentErrorMessage = null,
                 GameCode = action.GameCode,
                 Username = action.Username
             };
@@ -34,6 +35,17 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 CardsOnTable = new List<List<AnswerCard>>(),
                 SelectedCardsInHand = new List<AnswerCard>(),
                 SelectedCardsOnTable = new List<AnswerCard>(),
+            };
+    }
+
+    public record GameJoinedFailedEvent(string ErrorMessage)
+    {
+        [ReducerMethod]
+        public static GameState Reduce(GameState state, GameJoinedFailedEvent action)
+            => state with
+            {
+                IsLoading = false,
+                CurrentErrorMessage = action.ErrorMessage
             };
     }
 

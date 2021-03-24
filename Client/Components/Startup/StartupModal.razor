@@ -1,4 +1,7 @@
-﻿<div class="position-absolute h-100 w-100 bg-white" />
+﻿@inherits FluxorComponent
+@inject IState<GameState> GameState
+
+<div class="position-absolute h-100 w-100 bg-white" />
 
 <div class="modal d-block" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -9,6 +12,16 @@
                         <h2>Welcome to Card Against Whatever!</h2>
                     </div>
                 </div>
+                @if (GameState.Value.CurrentErrorMessage is not null)
+                {
+                    <div class="row">
+                        <div class="col px-5 py-3">
+                            <div class="alert alert-danger" role="alert">
+                                @GameState.Value.CurrentErrorMessage
+                            </div>
+                        </div>
+                    </div>
+                }
                 <div class="row">
                     <div class="col p-5 border-right">
                         <CreateGameForm />

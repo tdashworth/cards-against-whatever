@@ -1,5 +1,6 @@
 ﻿using CardsAgainstWhatever.Server.Commands;
 using CardsAgainstWhatever.Server.Services.Interfaces;
+using CardsAgainstWhatever.Shared.Dtos;
 using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
@@ -24,29 +25,32 @@ namespace CardsAgainstWhatever.Server.Hubs
         private string? GameCode => connectionUserMapping.ContainsKey(Context.ConnectionId) ? connectionUserMapping[Context.ConnectionId].GameCode : null;
         private string? Username => connectionUserMapping.ContainsKey(Context.ConnectionId) ? connectionUserMapping[Context.ConnectionId].Username : null;
 
-        public async Task JoinGame(string gameCode, string username)
+        public Task<Response> JoinGame(string gameCode, string username) => TryOrReturnExeception(async () =>
         {
             if (gameCode is null) throw new ArgumentNullException(nameof(gameCode));
             if (username is null) throw new ArgumentNullException(nameof(username));
 
             await mediator.Send(new JoinGameCommand(gameCode, username, Context.ConnectionId));
             connectionUserMapping.Add(Context.ConnectionId, new GameCodeAndUsername(gameCode, username));
-        }
+        });
 
-        public Task StartRound()
-            => mediator.Send(new StartRoundCommand(GameCode!));
+        public Task<Response> StartRound() => TryOrReturnExeception(()
+            => mediator.Send(new StartRoundCommand(GameCode!))
+        );
 
-        public Task PlayAnswer(IEnumerable<AnswerCard> answerCards)
-            => mediator.Send(new PlayAnswerCommand(GameCode!, Username!, answerCards));
+        public Task<Response> PlayAnswer(IEnumerable<AnswerCard> answerCards) => TryOrReturnExeception(()
+            => mediator.Send(new PlayAnswerCommand(GameCode!, Username!, answerCards))
+        );
 
-        public Task PickWinningAnswer(IEnumerable<AnswerCard> answerCards)
-            => mediator.Send(new PickWinningAnswerCommand(GameCode!, answerCards));
+        public Task<Response> PickWinningAnswer(IEnumerable<AnswerCard> answerCards) => TryOrReturnExeception(()
+            => mediator.Send(new PickWinningAnswerCommand(GameCode!, answerCards))
+        );
 
-        public async Task LeaveGame()
+        public Task<Response> LeaveGame() => TryOrReturnExeception(async () =>
         {
             await mediator.Send(new LeaveGameCommand(GameCode!, Username!));
             connectionUserMapping.Remove(Context.ConnectionId);
-        }
+        });
 
         public async override Task OnDisconnectedAsync(Exception? exception)
         {
@@ -56,6 +60,18 @@ namespace CardsAgainstWhatever.Server.Hubs
                 connectionUserMapping.Remove(Context.ConnectionId);
             }
             await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task<Response> TryOrReturnExeception(Func<Task> func)
+        {
+            try
+            {
+                await func();
+                return new Response();
+            } catch (Exception ex)
+            {
+                return new Response { ErrorMessage = ex.Message };
+            }
         }
     }
 }
