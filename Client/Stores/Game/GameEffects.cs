@@ -1,10 +1,6 @@
 ﻿using CardsAgainstWhatever.Client.Stores.Server;
-using CardsAgainstWhatever.Shared.Interfaces;
+using CardsAgainstWhatever.Client.Stores.Toasts;
 using Fluxor;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
-using SignalR.Strong;
-using System;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Stores.Game
@@ -38,7 +34,12 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         {
             if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
 
-            await ServerState.Value.GameServer.StartRound();
+            var response = await ServerState.Value.GameServer.StartRound();
+
+            if (response is not null && response.ErrorMessage is not null)
+            {
+                dispatcher.Dispatch(new AddToast(new Toast("Oops, something when wrong!", response.ErrorMessage)));
+            }
         }
 
         [EffectMethod]
@@ -47,7 +48,12 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
             if (GameState.Value.SelectedCardsInHand is null) return;
 
-            await ServerState.Value.GameServer.PlayAnswer(GameState.Value.SelectedCardsInHand);
+            var response = await ServerState.Value.GameServer.PlayAnswer(GameState.Value.SelectedCardsInHand);
+
+            if (response is not null && response.ErrorMessage is not null)
+            {
+                dispatcher.Dispatch(new AddToast(new Toast("Oops, something when wrong!", response.ErrorMessage)));
+            }
         }
 
         [EffectMethod]
@@ -56,7 +62,12 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
             if (GameState.Value.SelectedCardsOnTable is null) return;
 
-            await ServerState.Value.GameServer.PickWinningAnswer(GameState.Value.SelectedCardsOnTable);
+            var response = await ServerState.Value.GameServer.PickWinningAnswer(GameState.Value.SelectedCardsOnTable);
+
+            if (response is not null && response.ErrorMessage is not null)
+            {
+                dispatcher.Dispatch(new AddToast(new Toast("Oops, something when wrong!", response.ErrorMessage)));
+            }
         }
 
         [EffectMethod]
@@ -64,7 +75,12 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         {
             if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
 
-            await ServerState.Value.GameServer.LeaveGame();
+            var response = await ServerState.Value.GameServer.LeaveGame();
+
+            if (response is not null && response.ErrorMessage is not null)
+            {
+                dispatcher.Dispatch(new AddToast(new Toast("Oops, something when wrong!", response.ErrorMessage)));
+            }
         }
     }
 }

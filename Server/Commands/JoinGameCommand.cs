@@ -20,7 +20,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class JoinGameHandler : BaseGameRequestHandler<JoinGameCommand>
     {
-        public JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<JoinGameCommand>>    logger)
+        public JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<JoinGameCommand>> logger)
             : base(gameRepositoy, hubContextFascade, logger) { }
 
         public async override Task HandleVoid(JoinGameCommand request, CancellationToken cancellationToken)

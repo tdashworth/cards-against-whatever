@@ -1,12 +1,9 @@
-﻿using CardsAgainstWhatever.Client.Services;
-using CardsAgainstWhatever.Shared.Interfaces;
+﻿using CardsAgainstWhatever.Shared.Interfaces;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Strong;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Stores.Server

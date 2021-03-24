@@ -28,8 +28,8 @@ namespace CardsAgainstWhatever.Server.Models
             if (RoundNumber is null)
             {
                 RoundNumber = 0;
-            } 
-            
+            }
+
             RoundNumber++;
         }
 

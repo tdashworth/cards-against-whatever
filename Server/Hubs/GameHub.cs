@@ -68,7 +68,8 @@ namespace CardsAgainstWhatever.Server.Hubs
             {
                 await func();
                 return new Response();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return new Response { ErrorMessage = ex.Message };
             }

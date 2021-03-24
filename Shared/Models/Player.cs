@@ -1,6 +1,6 @@
 ﻿namespace CardsAgainstWhatever.Shared.Models
 {
-    
+
 
     public class Player
     {
