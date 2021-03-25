@@ -19,19 +19,19 @@ namespace CardsAgainstWhatever.Server.Services
                 GeneratorUniqueCode(new Random(), GameStore.Keys),
                 new CardDeck(questionCards, answerCards));
 
-            GameStore.Add(game.Code, game);
+            GameStore.Add(game.Code.ToUpper(), game);
 
             return Task.FromResult(game.Code);
         }
 
         public Task<ServerGame> GetByCode(string code)
         {
-            if (!GameStore.ContainsKey(code))
+            if (!GameStore.ContainsKey(code.ToUpper()))
             {
                 throw new Exception($"Game {code} doesn't exist.");
             }
 
-            return Task.FromResult(GameStore[code]);
+            return Task.FromResult(GameStore[code.ToUpper()]);
         }
 
         private string GeneratorUniqueCode(Random random, IEnumerable<string> existingCodes)
