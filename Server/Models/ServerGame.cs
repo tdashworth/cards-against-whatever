@@ -1,6 +1,7 @@
 ﻿using CardsAgainstWhatever.Shared.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CardsAgainstWhatever.Server.Models
 {
@@ -35,9 +36,9 @@ namespace CardsAgainstWhatever.Server.Models
 
         public void SelectNextCardCzar()
         {
-            if (Players is null || Players.Count < 2)
+            if (Players.Count(player => player.Status != PlayerStatus.Left) < 2)
             {
-                throw new Exception("Not enough players!");
+                throw new Exception("Not enough active players!");
             }
 
             var nextPlayerIndex = CurrentCardCzar is null

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CardsAgainstWhatever.Shared.Models
 {
@@ -21,6 +22,10 @@ namespace CardsAgainstWhatever.Shared.Models
 
         public QuestionCard PickUpQuestion()
         {
+            if (UnplayedQuestions.Count == 0)
+            {
+                new Exception("There are no more question cards available.");
+            }
             var question = UnplayedQuestions.Pop();
             PlayedQuestions.Push(question);
 
@@ -29,6 +34,11 @@ namespace CardsAgainstWhatever.Shared.Models
 
         public AnswerCard PickUpAnswer()
         {
+            if (UnplayedAnswers.Count == 0)
+            {
+                new Exception("There are no more answer cards available.");
+            }
+
             var answer = UnplayedAnswers.Pop();
             PlayedAnswers.Push(answer);
 

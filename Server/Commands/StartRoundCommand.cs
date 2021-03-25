@@ -44,10 +44,10 @@ namespace CardsAgainstWhatever.Server.Commands
 
         private static void StartRoundForGame(ServerGame game)
         {
-            game.Status = GameStatus.CollectingAnswers;
             game.IncrementRoundNumber();
             game.SelectNextCardCzar();
             game.SelectNextQuestion();
+            game.Status = GameStatus.CollectingAnswers;
         }
 
         private Task StartRoundForPlayer(ServerGame game, ServerPlayer player)
