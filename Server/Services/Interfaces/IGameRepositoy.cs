@@ -8,7 +8,7 @@ namespace CardsAgainstWhatever.Server.Services.Interfaces
     public interface IGameRepositoy
     {
         Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards);
-
+        Task Delete(string code);
         Task<ServerGame> GetByCode(string code);
     }
 }

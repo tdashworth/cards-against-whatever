@@ -34,6 +34,13 @@ namespace CardsAgainstWhatever.Server.Services
             return Task.FromResult(GameStore[code.ToUpper()]);
         }
 
+        public Task Delete(string code)
+        {
+            GameStore.Remove(code);
+
+            return Task.CompletedTask;
+        }
+
         private string GeneratorUniqueCode(Random random, IEnumerable<string> existingCodes)
         {
             string code;
