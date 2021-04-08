@@ -48,6 +48,10 @@ namespace CardsAgainstWhatever.Server.Commands
             }
 
             player.PlayedCards = request.SelectedAnswerCards.ToList();
+            foreach(var card in request.SelectedAnswerCards)
+            {
+                player.CardsInHand.Remove(card);
+            }
             player.Status = PlayerStatus.AnswerPlayed;
 
             await gameGroupClient.PlayerMoved(player);
