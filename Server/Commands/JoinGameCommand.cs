@@ -50,6 +50,8 @@ namespace CardsAgainstWhatever.Server.Commands
             await callingPlayerClient.GameJoined(
                 gameStatus: game.Status,
                 existingPlayersInGame: game.Players.Cast<Player>().ToList(),
+                cardsInHand: player.CardsInHand,
+                cardsOnTable: game.CardsOnTable,
                 currentRoundNumber: game.RoundNumber,
                 currentQuestion: game.CurrentQuestion,
                 currentCardCzar: game.CurrentCardCzar);

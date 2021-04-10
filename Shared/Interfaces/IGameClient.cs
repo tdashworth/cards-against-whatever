@@ -9,6 +9,8 @@ namespace CardsAgainstWhatever.Shared.Interfaces
         Task GameJoined(
             GameStatus gameStatus,
             IEnumerable<Player> existingPlayersInGame,
+            IEnumerable<AnswerCard> cardsInHand,
+            IEnumerable<IList<AnswerCard>> cardsOnTable,
             int? currentRoundNumber,
             QuestionCard? currentQuestion,
             Player? currentCardCzar);

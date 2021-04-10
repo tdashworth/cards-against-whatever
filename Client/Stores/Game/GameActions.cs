@@ -19,7 +19,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record GameJoinedEvent(GameStatus gameStatus, IEnumerable<Player> ExistingPlayersInGame, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
+    public record GameJoinedEvent(GameStatus gameStatus, IEnumerable<Player> ExistingPlayersInGame, IEnumerable<AnswerCard> cardsInHand, IEnumerable<IList<AnswerCard>> cardsOnTable, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, GameJoinedEvent action)
@@ -31,8 +31,8 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 CurrentRoundNumber = action.CurrentRoundNumber,
                 CurrentQuestion = action.CurrentQuestion,
                 CurrentCardCzar = action.CurrentCardCzar?.Username is not null ? state.Players.FindByUsername(action.CurrentCardCzar.Username) : null,
-                CardsInHand = new List<AnswerCard>(),
-                CardsOnTable = new List<List<AnswerCard>>(),
+                CardsInHand = action.cardsInHand.ToList(),
+                CardsOnTable = action.cardsOnTable.ToList(),
                 SelectedCardsInHand = new List<AnswerCard>(),
                 SelectedCardsOnTable = new List<AnswerCard>(),
             };
@@ -176,13 +176,13 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record WinnerSelectedAction(List<AnswerCard> WinningAnswer)
+    public record WinnerSelectedAction(IList<AnswerCard> WinningAnswer)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, WinnerSelectedAction action)
             => state with
             {
-                SelectedCardsOnTable = action.WinningAnswer
+                SelectedCardsOnTable = action.WinningAnswer.ToList()
             };
     }
 

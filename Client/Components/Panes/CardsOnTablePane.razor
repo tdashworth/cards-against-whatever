@@ -42,12 +42,12 @@
     public string CssStyle { get; set; } = string.Empty;
 
 
-    void OnWinningCardSetSelected(List<AnswerCard> cards)
+    void OnWinningCardSetSelected(IList<AnswerCard> cards)
     {
         if (!GameState.Value.IsCardCzar) return;
 
         Dispatcher.Dispatch(new WinnerSelectedAction(cards));
     }
 
-    bool IsSelected(List<AnswerCard> playerSelection) => playerSelection == GameState.Value.SelectedCardsOnTable;
+    bool IsSelected(IList<AnswerCard> playerSelection) => playerSelection == GameState.Value.SelectedCardsOnTable;
 }

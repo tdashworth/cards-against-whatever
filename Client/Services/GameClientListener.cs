@@ -17,9 +17,9 @@ namespace CardsAgainstWhatever.Client.Services
             this.dispatcher = dispatcher;
         }
 
-        public Task GameJoined(GameStatus gameStatus, IEnumerable<Player> existingPlayersInGame, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
+        public Task GameJoined(GameStatus gameStatus, IEnumerable<Player> existingPlayersInGame, IEnumerable<AnswerCard> cardsInHand, IEnumerable<IList<AnswerCard>> cardsOnTable, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
         {
-            dispatcher.Dispatch(new GameJoinedEvent(gameStatus, existingPlayersInGame, currentRoundNumber, currentQuestion, currentCardCzar));
+            dispatcher.Dispatch(new GameJoinedEvent(gameStatus, existingPlayersInGame, cardsInHand, cardsOnTable, currentRoundNumber, currentQuestion, currentCardCzar));
             return Task.CompletedTask;
         }
 

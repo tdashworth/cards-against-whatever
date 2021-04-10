@@ -15,7 +15,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         int? CurrentRoundNumber,
         QuestionCard? CurrentQuestion,
         Player? CurrentCardCzar,
-        IReadOnlyList<List<AnswerCard>>? CardsOnTable,
+        IReadOnlyList<IList<AnswerCard>>? CardsOnTable,
         IReadOnlyList<AnswerCard>? SelectedCardsOnTable,
         IReadOnlyList<AnswerCard>? CardsInHand,
         IReadOnlyList<AnswerCard>? SelectedCardsInHand)
