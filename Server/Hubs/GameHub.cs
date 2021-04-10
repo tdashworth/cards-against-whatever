@@ -27,6 +27,9 @@ namespace CardsAgainstWhatever.Server.Hubs
 
         public Task<Response> JoinGame(string gameCode, string username) => TryOrReturnExeception(async () =>
         {
+            gameCode = gameCode.ToUpper();
+            username = username.Trim();
+
             if (gameCode is null) throw new ArgumentNullException(nameof(gameCode));
             if (username is null) throw new ArgumentNullException(nameof(username));
 

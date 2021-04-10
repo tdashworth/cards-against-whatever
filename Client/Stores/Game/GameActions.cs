@@ -14,8 +14,8 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             {
                 IsLoading = true,
                 CurrentErrorMessage = null,
-                GameCode = action.GameCode,
-                Username = action.Username
+                GameCode = action.GameCode.ToUpper(),
+                Username = action.Username.Trim()
             };
     }
 
@@ -143,8 +143,16 @@ namespace CardsAgainstWhatever.Client.Stores.Game
     public record PlayAnswerAction()
     {
         [ReducerMethod]
-        public static GameState Reduce(GameState state, StartRoundAction action)
-            => state;
+        public static GameState Reduce(GameState state, PlayAnswerAction action)
+            => state with
+            {
+                CardsInHand = state.CardsInHand!.CopyAndUpdate(cards => { 
+                    foreach (var card in state.SelectedCardsInHand!)
+                    {
+                        cards.Remove(card);
+                    }
+                })
+            };
     }
 
     public record AnswerPlayedEvent(string Username)
@@ -229,7 +237,8 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             => state with
             {
                 GameCode = null,
-                Username = null
+                Username = null,
+                Status = null
             };
     }
 }

@@ -25,8 +25,8 @@ namespace CardsAgainstWhatever.Server.Commands
 
         public async override Task HandleVoid(JoinGameCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
-            var allPlayersClient = hubContextFascade.GetGroup(request.GameCode);
+            var game = await gameRepositoy.GetByCode(request.GameCode.ToUpper());
+            var allPlayersClient = hubContextFascade.GetGroup(request.GameCode.ToUpper());
             var callingPlayerClient = hubContextFascade.GetClient(request.ConnectionId);
 
             var player = game.Players.FirstOrDefault(player => player.Username == request.Username);
@@ -56,7 +56,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             await allPlayersClient.PlayerJoined((Player)player);
 
-            await hubContextFascade.JoinGroup(request.GameCode, request.ConnectionId);
+            await hubContextFascade.JoinGroup(request.GameCode.ToUpper(), request.ConnectionId);
         }
     }
 }
