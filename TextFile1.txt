@@ -1,57 +1,16 @@
 ﻿
-# Messages
+Typos:
+a bunch of jackasses standing in a circle
+being peer pressured into signing the Sokovia Accords
+a penis that's black on the outside, and while on the inside
+an emergency manturbation break
 
-## CreateGame ✔
-Give:
-- Cards
-Get:
-- Code
-- Pin?
 
-## JoinGame  ✔
-Give:
-- Code
-- Pin
-- Username
-Get:
-- Players
-	- Username
-Publish:
-- NewPlayer
-	- Username
-
-## StartRound
-Give:
-Get:
-Publish:
-- NewRound
-	- Drawn Cards (Play specific)
-	- Card Czar
-	- Question Card
-
-## PlayCards
-Give:
-- Cards
-	- Text
-Get:
-Publish:
-- CardPlayed
-	- Username
-? RoundClosed
-	- Played Cards
-		- Cards
-			- Text
-
-## PickWinner
-Give:
-- Card
-	-Text
-Get:
-Publish:
-- RoundWinner
-	- Cards
-		- Text
-	- Player
-		- Username
-
-... NewRound
+Issues:
+- More notifications
+- See winning card
+- See who played each card
+- 2 pick, selection order
+- auto play next round after x seconds
+- cards usage progress
+- stop selecting cards (translating up) when it doesn't make sence not card czar
