@@ -15,10 +15,11 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         int? CurrentRoundNumber,
         QuestionCard? CurrentQuestion,
         Player? CurrentCardCzar,
-        IReadOnlyList<IList<AnswerCard>>? CardsOnTable,
+        IReadOnlyList<IReadOnlyList<AnswerCard>>? CardsOnTable,
         IReadOnlyList<AnswerCard>? SelectedCardsOnTable,
         IReadOnlyList<AnswerCard>? CardsInHand,
-        IReadOnlyList<AnswerCard>? SelectedCardsInHand)
+        IReadOnlyList<AnswerCard>? SelectedCardsInHand,
+        IReadOnlyDictionary<string, IReadOnlyList<AnswerCard>>? PlayersSelections)
     {
         public bool IsCardCzar => CurrentCardCzar?.Username == Username;
         public Player? Me => Players?.FindByUsername(Username ?? "");
@@ -28,6 +29,6 @@ namespace CardsAgainstWhatever.Client.Stores.Game
     {
         public override string GetName() => "Game";
 
-        protected override GameState GetInitialState() => new GameState(false, null, null, null, null, null, null, null, null, null, null, null, null);
+        protected override GameState GetInitialState() => new GameState(false, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }

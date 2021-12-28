@@ -19,7 +19,7 @@
         ? null
         : "Select the card(s) that most made you laugh.";
 
-    bool IsCardSetSelected => GameState.Value.SelectedCardsOnTable!.Any();
+    bool IsCardSetSelected => GameState.Value.SelectedCardsOnTable is not null && GameState.Value.SelectedCardsOnTable.Any();
 
     void OnClick() => Dispatcher.Dispatch(new PickWinnerAction());
 }

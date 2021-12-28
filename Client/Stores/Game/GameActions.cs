@@ -19,7 +19,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record GameJoinedEvent(GameStatus gameStatus, IEnumerable<Player> ExistingPlayersInGame, IEnumerable<AnswerCard> cardsInHand, IEnumerable<IList<AnswerCard>> cardsOnTable, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
+    public record GameJoinedEvent(GameStatus gameStatus, IEnumerable<Player> ExistingPlayersInGame, IEnumerable<AnswerCard> cardsInHand, IEnumerable<IReadOnlyList<AnswerCard>> cardsOnTable, int? CurrentRoundNumber, QuestionCard? CurrentQuestion, Player? CurrentCardCzar)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, GameJoinedEvent action)
@@ -34,7 +34,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 CardsInHand = action.cardsInHand.ToList(),
                 CardsOnTable = action.cardsOnTable.ToList(),
                 SelectedCardsInHand = new List<AnswerCard>(),
-                SelectedCardsOnTable = new List<AnswerCard>(),
+                SelectedCardsOnTable = null,
             };
     }
 
@@ -105,10 +105,11 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                 CurrentCardCzar = state.Players
                                             .FindByUsername(action.CurrentCardCzarUsername)
                                             .Update(player => player!.Status = PlayerStatus.AwatingAnswers),
-                CardsOnTable = new List<List<AnswerCard>>(),
+                CardsOnTable = new List<IReadOnlyList<AnswerCard>>(),
                 CardsInHand = state.CardsInHand!.CopyAndUpdate(cards => cards.AddRange(action.DealtCards)),
                 SelectedCardsInHand = new List<AnswerCard>(),
-                SelectedCardsOnTable = new List<AnswerCard>()
+                SelectedCardsOnTable = null,
+                PlayersSelections = null,
             };
     }
 
@@ -118,23 +119,16 @@ namespace CardsAgainstWhatever.Client.Stores.Game
         public static GameState Reduce(GameState state, AnswerSelectedAction action)
             => state with
             {
-                SelectedCardsInHand = state.SelectedCardsInHand!.CopyAndUpdate(cards =>
+                SelectedCardsInHand = state.SelectedCardsInHand is null || state.CurrentQuestion!.Picks == 1
+                ? new List<AnswerCard> { action.Answer }
+                : state.SelectedCardsInHand.CopyAndUpdate(cards =>
                 {
-                    if (state.CurrentQuestion!.Picks == 1)
+                    if (cards.Contains(action.Answer))
                     {
-                        cards.Clear();
+                        cards.Remove(action.Answer);
+                    } else
+                    {
                         cards.Add(action.Answer);
-                    }
-                    else
-                    {
-                        if (cards.Contains(action.Answer))
-                        {
-                            cards.Remove(action.Answer);
-                        }
-                        else if (cards.Count < state.CurrentQuestion!.Picks)
-                        {
-                            cards.Add(action.Answer);
-                        }
                     }
                 })
             };
@@ -176,13 +170,13 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record WinnerSelectedAction(IList<AnswerCard> WinningAnswer)
+    public record WinnerSelectedAction(IReadOnlyList<AnswerCard> WinningAnswer)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, WinnerSelectedAction action)
             => state with
             {
-                SelectedCardsOnTable = action.WinningAnswer.ToList()
+                SelectedCardsOnTable = action.WinningAnswer
             };
     }
 
@@ -205,7 +199,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             };
     }
 
-    public record RoundEndedEvent(string Username)
+    public record RoundEndedEvent(string Username, Dictionary<string, IReadOnlyList<AnswerCard>> PlayersSelections)
     {
         [ReducerMethod]
         public static GameState Reduce(GameState state, RoundEndedEvent action)
@@ -225,8 +219,9 @@ namespace CardsAgainstWhatever.Client.Stores.Game
                         }
                     }
                 }),
-                SelectedCardsInHand = new List<AnswerCard>(),
-                SelectedCardsOnTable = new List<AnswerCard>(),
+                SelectedCardsInHand = null,
+                SelectedCardsOnTable = null,
+                PlayersSelections = action.PlayersSelections
             };
     }
 

@@ -17,7 +17,7 @@ namespace CardsAgainstWhatever.Client.Services
             this.dispatcher = dispatcher;
         }
 
-        public Task GameJoined(GameStatus gameStatus, IEnumerable<Player> existingPlayersInGame, IEnumerable<AnswerCard> cardsInHand, IEnumerable<IList<AnswerCard>> cardsOnTable, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
+        public Task GameJoined(GameStatus gameStatus, IEnumerable<Player> existingPlayersInGame, IEnumerable<AnswerCard> cardsInHand, IEnumerable<IReadOnlyList<AnswerCard>> cardsOnTable, int? currentRoundNumber, QuestionCard? currentQuestion, Player? currentCardCzar)
         {
             dispatcher.Dispatch(new GameJoinedEvent(gameStatus, existingPlayersInGame, cardsInHand, cardsOnTable, currentRoundNumber, currentQuestion, currentCardCzar));
             return Task.CompletedTask;
@@ -49,15 +49,15 @@ namespace CardsAgainstWhatever.Client.Services
             return Task.CompletedTask;
         }
 
-        public Task RoundClosed(IEnumerable<IEnumerable<AnswerCard>> playedCardsGroupedPerPlayer)
+        public Task RoundClosed(IEnumerable<IReadOnlyList<AnswerCard>> playedCardsGroupedPerPlayer)
         {
             dispatcher.Dispatch(new RoundClosedEvent(playedCardsGroupedPerPlayer));
             return Task.CompletedTask;
         }
 
-        public Task RoundEnded(Player winningPlayer)
+        public Task RoundEnded(Player winningPlayer, Dictionary<string, IReadOnlyList<AnswerCard>> playersSelection)
         {
-            dispatcher.Dispatch(new RoundEndedEvent(winningPlayer.Username));
+            dispatcher.Dispatch(new RoundEndedEvent(winningPlayer.Username, playersSelection));
             dispatcher.Dispatch(new AddToast(new Toast("Round Ended", $"Well done {winningPlayer.Username}! You won the game 🎉")));
             return Task.CompletedTask;
         }

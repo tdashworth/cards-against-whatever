@@ -21,16 +21,16 @@ namespace CardsAgainstWhatever.Server.Commands
     {
         private readonly IMediator mediator;
 
-        public LeaveGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<LeaveGameCommand>> logger, IMediator mediator)
-            : base(gameRepositoy, hubContextFascade, logger)
+        public LeaveGameHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<LeaveGameCommand>> logger, IMediator mediator)
+            : base(gameRepository, hubContextFacade, logger)
         {
             this.mediator = mediator;
         }
 
         public async override Task HandleVoid(LeaveGameCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
-            var allPlayersClient = hubContextFascade.GetGroup(request.GameCode);
+            var game = await gameRepository.GetByCode(request.GameCode);
+            var allPlayersClient = hubContextFacade.GetGroup(request.GameCode);
 
             var player = game.Players.FirstOrDefault(player => player.Username == request.Username);
 
@@ -43,7 +43,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             if (!string.IsNullOrEmpty(player.ConnectionId))
             {
-                await hubContextFascade.LeaveGroup(request.GameCode, player.ConnectionId);
+                await hubContextFacade.LeaveGroup(request.GameCode, player.ConnectionId);
                 player.ConnectionId = null;
             }
 

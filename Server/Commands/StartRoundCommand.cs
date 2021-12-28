@@ -19,12 +19,12 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class StartRoundHandler : BaseGameRequestHandler<StartRoundCommand>
     {
-        public StartRoundHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<StartRoundCommand>> logger)
-            : base(gameRepositoy, hubContextFascade, logger) { }
+        public StartRoundHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<StartRoundCommand>> logger)
+            : base(gameRepository, hubContextFacade, logger) { }
 
         public async override Task HandleVoid(StartRoundCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
+            var game = await gameRepository.GetByCode(request.GameCode);
 
             if (game.Status != GameStatus.Lobby)
             {
@@ -52,7 +52,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
         private Task StartRoundForPlayer(ServerGame game, ServerPlayer player)
         {
-            var playerClient = hubContextFascade.GetClient(player.ConnectionId!);
+            var playerClient = hubContextFacade.GetClient(player.ConnectionId!);
             var newCards = game.CardDeck.PickUpAnswers(10 - player.CardsInHand.Count);
             player.CardsInHand.AddRange(newCards);
             player.Status = PlayerStatus.PlayingAnswer;

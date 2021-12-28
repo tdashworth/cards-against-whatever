@@ -10,7 +10,7 @@ namespace CardsAgainstWhatever.Shared.Interfaces
             GameStatus gameStatus,
             IEnumerable<Player> existingPlayersInGame,
             IEnumerable<AnswerCard> cardsInHand,
-            IEnumerable<IList<AnswerCard>> cardsOnTable,
+            IEnumerable<IReadOnlyList<AnswerCard>> cardsOnTable,
             int? currentRoundNumber,
             QuestionCard? currentQuestion,
             Player? currentCardCzar);
@@ -27,8 +27,8 @@ namespace CardsAgainstWhatever.Shared.Interfaces
 
         Task PlayerMoved(Player player);
 
-        Task RoundClosed(IEnumerable<IEnumerable<AnswerCard>> playedCardsGroupedPerPlayer);
+        Task RoundClosed(IEnumerable<IReadOnlyList<AnswerCard>> playedCardsGroupedPerPlayer);
 
-        Task RoundEnded(Player winningPlayer);
+        Task RoundEnded(Player winningPlayer, Dictionary<string, IReadOnlyList<AnswerCard>> playersSelection);
     }
 }

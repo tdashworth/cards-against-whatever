@@ -25,7 +25,7 @@ namespace CardsAgainstWhatever.Server.Hubs
         private string? GameCode => connectionUserMapping.ContainsKey(Context.ConnectionId) ? connectionUserMapping[Context.ConnectionId].GameCode : null;
         private string? Username => connectionUserMapping.ContainsKey(Context.ConnectionId) ? connectionUserMapping[Context.ConnectionId].Username : null;
 
-        public Task<Response> JoinGame(string gameCode, string username) => TryOrReturnExeception(async () =>
+        public Task<Response> JoinGame(string gameCode, string username) => TryOrReturnException(async () =>
         {
             gameCode = gameCode.ToUpper();
             username = username.Trim();
@@ -37,19 +37,19 @@ namespace CardsAgainstWhatever.Server.Hubs
             connectionUserMapping.Add(Context.ConnectionId, new GameCodeAndUsername(gameCode, username));
         });
 
-        public Task<Response> StartRound() => TryOrReturnExeception(()
+        public Task<Response> StartRound() => TryOrReturnException(()
             => mediator.Send(new StartRoundCommand(GameCode!))
         );
 
-        public Task<Response> PlayAnswer(IEnumerable<AnswerCard> answerCards) => TryOrReturnExeception(()
+        public Task<Response> PlayAnswer(IReadOnlyList<AnswerCard> answerCards) => TryOrReturnException(()
             => mediator.Send(new PlayAnswerCommand(GameCode!, Username!, answerCards))
         );
 
-        public Task<Response> PickWinningAnswer(IEnumerable<AnswerCard> answerCards) => TryOrReturnExeception(()
+        public Task<Response> PickWinningAnswer(IReadOnlyList<AnswerCard> answerCards) => TryOrReturnException(()
             => mediator.Send(new PickWinningAnswerCommand(GameCode!, answerCards))
         );
 
-        public Task<Response> LeaveGame() => TryOrReturnExeception(async () =>
+        public Task<Response> LeaveGame() => TryOrReturnException(async () =>
         {
             await mediator.Send(new LeaveGameCommand(GameCode!, Username!));
             connectionUserMapping.Remove(Context.ConnectionId);
@@ -65,7 +65,7 @@ namespace CardsAgainstWhatever.Server.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        private async Task<Response> TryOrReturnExeception(Func<Task> func)
+        private async Task<Response> TryOrReturnException(Func<Task> func)
         {
             try
             {

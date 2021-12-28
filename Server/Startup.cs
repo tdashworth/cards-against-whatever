@@ -32,8 +32,8 @@ namespace CardsAgainstWhatever.Server
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddSingleton<IConnectionUserMapping, ConnectionUserMapping>();
-            services.AddScoped<IGameRepositoy, GameRepository>();
-            services.AddScoped<IHubContextFascade<IGameClient>, HubContextFascade<GameHub, IGameClient>>();
+            services.AddScoped<IGameRepository, GameRepository>();
+            services.AddScoped<IHubContextFacade<IGameClient>, HubContextFacade<GameHub, IGameClient>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

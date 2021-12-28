@@ -21,8 +21,8 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class CreateGameHandler : BaseGameRequestHandler<CreateGameCommand, GameCreatedEvent>
     {
-        public CreateGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<CreateGameCommand, GameCreatedEvent>> logger)
-            : base(gameRepositoy, hubContextFascade, logger) { }
+        public CreateGameHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<CreateGameCommand, GameCreatedEvent>> logger)
+            : base(gameRepository, hubContextFacade, logger) { }
 
         public async override Task<GameCreatedEvent> Handle(CreateGameCommand request, CancellationToken cancellationToken)
         {
@@ -38,7 +38,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             var random = new Random();
 
-            var gameCode = await gameRepositoy.Create(
+            var gameCode = await gameRepository.Create(
                 request.QuestionCards.Shuffle(random),
                 request.AnswerCards.Shuffle(random));
 

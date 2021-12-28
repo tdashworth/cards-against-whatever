@@ -1,6 +1,8 @@
 ﻿using CardsAgainstWhatever.Client.Stores.Server;
 using CardsAgainstWhatever.Client.Stores.Toasts;
+using CardsAgainstWhatever.Shared.Models;
 using Fluxor;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Client.Stores.Game
@@ -48,7 +50,7 @@ namespace CardsAgainstWhatever.Client.Stores.Game
             if (ServerState.Value.Status != ServerStatus.Connected || ServerState.Value.GameServer is null) return;
             if (GameState.Value.SelectedCardsInHand is null) return;
 
-            var response = await ServerState.Value.GameServer.PlayAnswer(GameState.Value.SelectedCardsInHand);
+            var response = await ServerState.Value.GameServer.PlayAnswer((IReadOnlyList<AnswerCard>) GameState.Value.SelectedCardsInHand);
 
             if (response is not null && response.ErrorMessage is not null)
             {

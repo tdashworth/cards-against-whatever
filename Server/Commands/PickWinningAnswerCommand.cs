@@ -20,13 +20,13 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class PickWinningAnswerHandler : BaseGameRequestHandler<PickWinningAnswerCommand>
     {
-        public PickWinningAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<PickWinningAnswerCommand>> logger)
-            : base(gameRepositoy, hubContextFascade, logger) { }
+        public PickWinningAnswerHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<PickWinningAnswerCommand>> logger)
+            : base(gameRepository, hubContextFacade, logger) { }
 
         public async override Task HandleVoid(PickWinningAnswerCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
-            var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
+            var game = await gameRepository.GetByCode(request.GameCode);
+            var gameGroupClient = hubContextFacade.GetGroup(request.GameCode);
 
             if (game.Status != GameStatus.SelectingWinner)
             {
@@ -44,11 +44,15 @@ namespace CardsAgainstWhatever.Server.Commands
             winner.WonCards.Add(game.CurrentQuestion!);
             winner.Score++;
 
+            var playersSelections = game.Players
+                .Where(player => player.PlayedCards is not null && player.PlayedCards.Any())
+                .ToDictionary(player => player.Username, player => (IReadOnlyList<AnswerCard>) player.PlayedCards!.ToList());
+
             ResetPlayers(game.Players);
 
             game.Status = GameStatus.Lobby;
 
-            await gameGroupClient.RoundEnded((Player)winner);
+            await gameGroupClient.RoundEnded((Player)winner, playersSelections);
         }
 
         private static void ResetPlayers(IEnumerable<ServerPlayer> players)
@@ -59,13 +63,13 @@ namespace CardsAgainstWhatever.Server.Commands
                 {
                     player.Status = PlayerStatus.Lobby;
                 }
-                player.PlayedCards.Clear();
+                player.PlayedCards = new List<AnswerCard>();
             }
         }
 
         private static ServerPlayer? DetermineWinnerFromPlayedCards(IEnumerable<ServerPlayer> players, IEnumerable<AnswerCard> winningCards)
         {
-            return players.FirstOrDefault(player => winningCards.All(card => player.PlayedCards.Contains(card)));
+            return players.FirstOrDefault(player => winningCards.All(card => player.PlayedCards is not null && player.PlayedCards.Contains(card)));
         }
     }
 }

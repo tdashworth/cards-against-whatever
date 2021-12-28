@@ -21,12 +21,15 @@
             <div class="game-card-list h-100 d-flex align-items-center">
                 @foreach (var card in GameState.Value.CardsInHand)
                 {
-                    <article class="game-card selectable-game-card answer-card @(IsSelected(card) ? "selected" : string.Empty)" @onclick="() => OnCardSelected(card)">
-                        <div class="dummy"></div>
-                        <header class="game-card-header">
-                            <p>@card.Text</p>
-                        </header>
-                    </article>
+                    <div class="selectable-game-card @(IsSelected(card) ? "selected" : string.Empty) mr-4">
+                        <article class="game-card answer-card" @onclick="() => OnCardSelected(card)">
+                            <div class="dummy"></div>
+                            <header class="game-card-header">
+                                <p>@card.Text</p>
+                            </header>
+                        </article>
+                        <span class="caption">@(IsSelected(card) ? "SELECTED": string.Empty)</span>
+                    </div>
                 }
             </div>
         }

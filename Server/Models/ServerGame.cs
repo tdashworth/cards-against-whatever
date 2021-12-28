@@ -58,8 +58,12 @@ namespace CardsAgainstWhatever.Server.Models
             CurrentQuestion = CardDeck.PickUpQuestion();
         }
 
-        public IEnumerable<IList<AnswerCard>> CardsOnTable => Status == GameStatus.CollectingAnswers
-            ? Players.Where(player => player.PlayedCards.Any()).Select(player => player.PlayedCards.Select(card => new AnswerCard("")).ToList())
-            : Players.Where(player => player.PlayedCards.Any()).Select(player => player.PlayedCards);
+        public IEnumerable<IReadOnlyList<AnswerCard>> CardsOnTable => Status == GameStatus.CollectingAnswers
+            ? Players
+                .Where(player => player.PlayedCards is not null && player.PlayedCards.Any())
+                .Select(player => player.PlayedCards!.Select(card => new AnswerCard("")).ToList())
+            : Players
+                .Where(player => player.PlayedCards is not null && player.PlayedCards.Any())
+                .Select(player => player.PlayedCards!);
     }
 }

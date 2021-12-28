@@ -19,7 +19,7 @@
         ? null 
         : "Select the card(s) you wish to play.";
 
-    bool IsPickEnoughCards => GameState.Value.CurrentQuestion?.Picks == GameState.Value.SelectedCardsInHand?.Count;
+    bool IsPickEnoughCards => GameState.Value.CurrentQuestion?.Picks == GameState.Value.SelectedCardsInHand?.Count();
 
     void OnClick() => Dispatcher.Dispatch(new PlayAnswerAction());
 }

@@ -3,8 +3,6 @@ using CardsAgainstWhatever.Shared.Interfaces;
 using CardsAgainstWhatever.Shared.Models;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,12 +16,12 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class EndGameHandler : BaseGameRequestHandler<EndGameCommand>
     {
-        public EndGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<EndGameCommand>> logger)
-            : base(gameRepositoy, hubContextFascade, logger) { }
+        public EndGameHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<EndGameCommand>> logger)
+            : base(gameRepository, hubContextFacade, logger) { }
 
         public async override Task HandleVoid(EndGameCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
+            var game = await gameRepository.GetByCode(request.GameCode);
             var activePlayers = game.Players.Where(player => player.Status != PlayerStatus.Left);
 
             if (activePlayers.Any())
@@ -31,7 +29,7 @@ namespace CardsAgainstWhatever.Server.Commands
                 return;
             }
 
-            await gameRepositoy.Delete(request.GameCode);
+            await gameRepository.Delete(request.GameCode);
         }
     }
 }

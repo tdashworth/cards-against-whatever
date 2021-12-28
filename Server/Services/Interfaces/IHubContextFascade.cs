@@ -2,7 +2,7 @@
 
 namespace CardsAgainstWhatever.Server.Services.Interfaces
 {
-    public interface IHubContextFascade<T>
+    public interface IHubContextFacade<T>
     {
         Task JoinGroup(string groupName, string connectionId);
         Task LeaveGroup(string groupName, string connectionId);

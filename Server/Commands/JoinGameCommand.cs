@@ -20,14 +20,14 @@ namespace CardsAgainstWhatever.Server.Commands
 
     class JoinGameHandler : BaseGameRequestHandler<JoinGameCommand>
     {
-        public JoinGameHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<JoinGameCommand>> logger)
-            : base(gameRepositoy, hubContextFascade, logger) { }
+        public JoinGameHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<JoinGameCommand>> logger)
+            : base(gameRepository, hubContextFacade, logger) { }
 
         public async override Task HandleVoid(JoinGameCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode.ToUpper());
-            var allPlayersClient = hubContextFascade.GetGroup(request.GameCode.ToUpper());
-            var callingPlayerClient = hubContextFascade.GetClient(request.ConnectionId);
+            var game = await gameRepository.GetByCode(request.GameCode.ToUpper());
+            var allPlayersClient = hubContextFacade.GetGroup(request.GameCode.ToUpper());
+            var callingPlayerClient = hubContextFacade.GetClient(request.ConnectionId);
 
             var player = game.Players.FirstOrDefault(player => player.Username == request.Username);
 
@@ -58,7 +58,7 @@ namespace CardsAgainstWhatever.Server.Commands
 
             await allPlayersClient.PlayerJoined((Player)player);
 
-            await hubContextFascade.JoinGroup(request.GameCode.ToUpper(), request.ConnectionId);
+            await hubContextFacade.JoinGroup(request.GameCode.ToUpper(), request.ConnectionId);
         }
     }
 }

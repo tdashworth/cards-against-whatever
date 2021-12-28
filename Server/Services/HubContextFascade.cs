@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Services
 {
-    public class HubContextFascade<THub, T> : IHubContextFascade<T>
+    public class HubContextFacade<THub, T> : IHubContextFacade<T>
         where THub : Hub<T>
         where T : class
     {
         private readonly IHubContext<THub, T> hubContext;
 
-        public HubContextFascade(IHubContext<THub, T> hubContext)
+        public HubContextFacade(IHubContext<THub, T> hubContext)
         {
             this.hubContext = hubContext;
         }

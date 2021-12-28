@@ -96,8 +96,8 @@ a,
     transform: translateY(-1.5rem);
 }
 
-    .selectable-game-card.selected::after {
-        content: 'SELECTED';
+    .selectable-game-card.selected .caption {
+        display: block;
         position: absolute;
         left: 0;
         right: 0;

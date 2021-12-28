@@ -15,6 +15,26 @@
                 </p>
             </div>
         }
+        else if (GameState.Value.PlayersSelections is not null)
+        {
+            <div class="game-card-list h-100 d-flex align-items-center">
+                @foreach (var (username, playersSelection) in GameState.Value.PlayersSelections)
+                {
+                    <div class="selectable-game-card selected mr-4">
+                        @foreach (var card in playersSelection)
+                        {
+                            <article class="game-card answer-card">
+                                <div class="dummy"></div>
+                                <header class="game-card-header">
+                                    <p>@card.Text</p>
+                                </header>
+                            </article>
+                        }
+                        <span class="caption">@username</span>
+                    </div>
+                }
+            </div>
+        }
         else
         {
             <div class="game-card-list h-100 d-flex align-items-center">
@@ -30,6 +50,7 @@
                                 </header>
                             </article>
                         }
+                        <span class="caption">@(IsSelected(playersSelection) ? "SELECTED": string.Empty)</span>
                     </div>
                 }
             </div>
@@ -42,12 +63,12 @@
     public string CssStyle { get; set; } = string.Empty;
 
 
-    void OnWinningCardSetSelected(IList<AnswerCard> cards)
+    void OnWinningCardSetSelected(IReadOnlyList<AnswerCard> playerSelection)
     {
         if (!GameState.Value.IsCardCzar) return;
 
-        Dispatcher.Dispatch(new WinnerSelectedAction(cards));
+        Dispatcher.Dispatch(new WinnerSelectedAction(playerSelection));
     }
 
-    bool IsSelected(IList<AnswerCard> playerSelection) => playerSelection == GameState.Value.SelectedCardsOnTable;
+    bool IsSelected(IReadOnlyList<AnswerCard> playerSelection) => playerSelection == GameState.Value.SelectedCardsOnTable;
 }

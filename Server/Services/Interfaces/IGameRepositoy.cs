@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Services.Interfaces
 {
-    public interface IGameRepositoy
+    public interface IGameRepository
     {
         Task<string> Create(IEnumerable<QuestionCard> questionCards, IEnumerable<AnswerCard> answerCards);
         Task Delete(string code);

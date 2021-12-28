@@ -13,19 +13,18 @@ namespace CardsAgainstWhatever.Server.Commands
 {
     public record CloseRoundCommand(
         string GameCode)
-
         : IRequest;
 
     class CloseRoundHandler : BaseGameRequestHandler<CloseRoundCommand>
     {
-        public CloseRoundHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<CloseRoundCommand>> logger)
-            : base(gameRepositoy, hubContextFascade, logger) { }
+        public CloseRoundHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<CloseRoundCommand>> logger)
+            : base(gameRepository, hubContextFacade, logger) { }
 
 
         public async override Task HandleVoid(CloseRoundCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
-            var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
+            var game = await gameRepository.GetByCode(request.GameCode);
+            var gameGroupClient = hubContextFacade.GetGroup(request.GameCode);
 
             if (game.Status != GameStatus.CollectingAnswers)
             {
@@ -45,8 +44,8 @@ namespace CardsAgainstWhatever.Server.Commands
             game.Status = GameStatus.SelectingWinner;
 
             var playedCardsGroupedPerPlayer = game.Players
-                    .Where(player => player.PlayedCards.Any())
-                    .Select(player => player.PlayedCards)
+                    .Where(player => player.PlayedCards is not null && player.PlayedCards.Any())
+                    .Select(player => player.PlayedCards!)
                     .ToList()
                     .Shuffle(new Random());
 

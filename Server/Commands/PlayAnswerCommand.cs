@@ -14,7 +14,7 @@ namespace CardsAgainstWhatever.Server.Commands
     public record PlayAnswerCommand(
         string GameCode,
         string Username,
-        IEnumerable<AnswerCard> SelectedAnswerCards)
+        IReadOnlyList<AnswerCard> SelectedAnswerCards)
 
         : IRequest;
 
@@ -22,16 +22,16 @@ namespace CardsAgainstWhatever.Server.Commands
     {
         private readonly IMediator mediator;
 
-        public PlayAnswerHandler(IGameRepositoy gameRepositoy, IHubContextFascade<IGameClient> hubContextFascade, ILogger<IRequestHandler<PlayAnswerCommand>> logger, IMediator mediator)
-            : base(gameRepositoy, hubContextFascade, logger)
+        public PlayAnswerHandler(IGameRepository gameRepository, IHubContextFacade<IGameClient> hubContextFacade, ILogger<IRequestHandler<PlayAnswerCommand>> logger, IMediator mediator)
+            : base(gameRepository, hubContextFacade, logger)
         {
             this.mediator = mediator;
         }
 
         public async override Task HandleVoid(PlayAnswerCommand request, CancellationToken cancellationToken)
         {
-            var game = await gameRepositoy.GetByCode(request.GameCode);
-            var gameGroupClient = hubContextFascade.GetGroup(request.GameCode);
+            var game = await gameRepository.GetByCode(request.GameCode);
+            var gameGroupClient = hubContextFacade.GetGroup(request.GameCode);
 
             if (game.Status != GameStatus.CollectingAnswers)
             {
@@ -47,8 +47,8 @@ namespace CardsAgainstWhatever.Server.Commands
                 throw new Exception($"Player {request.Username} not found in game {request.GameCode}.");
             }
 
-            player.PlayedCards = request.SelectedAnswerCards.ToList();
-            foreach(var card in request.SelectedAnswerCards)
+            player.PlayedCards = request.SelectedAnswerCards;
+            foreach (var card in request.SelectedAnswerCards)
             {
                 player.CardsInHand.Remove(card);
             }

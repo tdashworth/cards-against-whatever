@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CardsAgainstWhatever.Server.Services
 {
-    public class GameRepository : IGameRepositoy
+    public class GameRepository : IGameRepository
     {
         private static IDictionary<string, ServerGame> GameStore = new Dictionary<string, ServerGame>();
 
